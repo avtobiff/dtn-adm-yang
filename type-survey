@@ -1,0 +1,65 @@
+draft-ietf-dtn-ari-00 Section 3.2
+
+References
+
+RFC 9254
+
+
+AMM Literal Type    Used CBOR Type      Suggested YANG type
+
+NULL                null                empty (RFC 9254 CBOR null -> empty)
+BOOL                bool                bool
+BYTE                uint                amm:byte OR uint8
+INT                 int                 int(8,16,32,64)
+UINT                uint                uint(8,16,32,64)
+VAST                int                 int(8,16,32,64)
+UVAST               uint                uint(8,16,32,64)
+REAL32              float               amm:decimal32
+                                        CBOR major type 7, 5-bit value 26
+                                        RFC 8949 Section 3.3 Table 3
+REAL64              float               decimal64
+TEXTSTR             tstr                string
+BYTESTR             bstr                binary
+
+
+Non-primitive types
+
+TP                  lit-time            ietf-yang-types:date-and-time OR
+                                        amm:date-and-time with normative text
+
+TD                  lit-time            typedef amm:duration {
+                                            type string {
+                                                pattern "P(?=.*[YMWDTHS])(?:\d+Y)?(?:\d+M)?(?:\d+W)?(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+S)?)?";
+                                                reference "RFC 3339";
+                                            }
+                                        }
+
+                                        Should this really be allowed to be pos/neg?
+                                        How is a duration negative?
+
+LABEL               lit-label           typedef amm:label {
+                                            type string { pattern "[A-Za-z].*"; }
+                                        }
+
+CBOR                lit-cbor            typedef amm:cbor {
+                                            type binary;
+                                        }
+
+
+Containers
+
+AC                  ari-collection      leaf-list
+AM                  ari-map             list
+TBL                 ari-tbl             list OR leaf-list or amm:tbl
+
+EXECSET             exec-set            grouping { leaf nonce;
+                                                   leaf-list ari;
+                                                 }
+
+RPTSET              rpt-set             grouping { leaf nonce;
+                                                   leaf tp-val;
+                                                   list { leaf td-val;
+                                                          leaf ari;
+                                                          leaf-list ari;
+                                                        }
+                                                 }
