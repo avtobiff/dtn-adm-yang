@@ -14,6 +14,7 @@ INT                 int                 int(8,16,32,64)
 UINT                uint                uint(8,16,32,64)
 VAST                int                 int(8,16,32,64)
 UVAST               uint                uint(8,16,32,64)
+                                        Is UVAST supposed to be bignum?
 REAL32              float               amm:decimal32
                                         CBOR major type 7, 5-bit value 26
                                         RFC 8949 Section 3.3 Table 3
