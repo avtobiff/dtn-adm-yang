@@ -29,11 +29,27 @@ Non-primitive types
 TP                  lit-time            ietf-yang-types:date-and-time OR
                                         amm:date-and-time with normative text
 
-TD                  lit-time            typedef amm:duration {
+TD                  lit-time            typedef amm:offset {
+                                          description
+                                            "Either Human friendly duration
+                                             notation with leading + or - sign,
+                                             or float or int with max 64 bit
+                                             signed integer number of nanoseconds.
+
+                                             Human friendly duration notation from
+                                             RFC 3339 Appendix A, with a leading
+                                             plus or minus sign.
+
+                                             The components year and month from
+                                             RFC 3339 duration SHALL not be used.";
+                                          }
+                                          union {
                                             type string {
-                                                pattern "P(?=.*[YMWDTHS])(?:\d+Y)?(?:\d+M)?(?:\d+W)?(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+S)?)?";
-                                                reference "RFC 3339";
-                                            }
+                                              pattern "^(\+|-)?P(?!$)((\d+D)?(T(?!\d+H\d+S)(\d+H)?(\d+M)?(\d+S)?)?)$";
+                                              //pattern "^(\+|-)?P(?!$)((\d+W)$|(?!.*W)(?!\d+Y\d+D)(\d+Y)?(\d+M)?(\d+D)?(T(?!\d+H\d+S)(\d+H)?(\d+M)?(\d+S)?)?)$";
+                                              reference "RFC 3339";
+                                            type amm:real64;
+                                            type int64;
                                         }
 
                                         Should this really be allowed to be pos/neg?
