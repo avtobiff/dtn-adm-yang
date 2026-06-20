@@ -26,10 +26,49 @@ BYTESTR             bstr                binary
 
 Non-primitive types
 
-TP                  lit-time            ietf-yang-types:date-and-time OR
+ARI                 ari                 typedef amm:ari {
+                                          type string {
+                                            pattern "^ari:.*";
+                                          }
+                                          description
+                                            "Text encoded ARI.";
+                                        }
+
+TP                  lit-time            typedef amm:time {
+                                          type uint64;
+                                          description
+                                            "DTN Time
+
+                                             An unsigned integer representing
+                                             number of milliseconds since the
+                                             DTN Epoch 2000-01-01T00:00:00Z.
+
+                                             Not affected by leap second";
+                                          reference
+                                            "RFC 9171: Bundle Protocol Version 7,
+                                             Section 4.2.6 DTN Time";
+                                        }
+
+                                        // alternative name?
+                                        // typedef amm:dtn-time
+
+                                        === ALTERNATIVES ===
+
+                                        ietf-yang-types:date-and-time OR
                                         amm:date-and-time with normative text
 
-TD                  lit-time            typedef amm:offset {
+TD                  lit-time            === SIMPLE ALTERNATIVE ===
+
+                                        typedef amm:offset {
+                                          units "nanoseconds";
+                                          type decimal64 {
+                                            fraction-digits 9;
+                                          }
+                                        }
+
+                                        === CURRENT DRAFT DEFINITION ===
+
+                                        typedef amm:offset {
                                           description
                                             "Either Human friendly duration
                                              notation with leading + or - sign,
@@ -52,32 +91,87 @@ TD                  lit-time            typedef amm:offset {
                                             type int64;
                                         }
 
-                                        Should this really be allowed to be pos/neg?
-                                        How is a duration negative?
 
 LABEL               lit-label           typedef amm:label {
-                                            type string { pattern "[A-Za-z].*"; }
+                                          type union {
+                                            type string {
+                                              pattern
+                                                "!?[A-Za-z_][A-Za-z0-9_\-\.]*";
+                                            }
+                                            type int32;
+                                          }
                                         }
 
 CBOR                lit-cbor            typedef amm:cbor {
-                                            type binary;
+                                          type binary;
+                                          description
+                                            "Arbitrary CBOR content.
+
+                                             Note the content is CBOR as defined
+                                             in RFC 8949, no constraints from
+                                             RFC 9254 are in effect.";
                                         }
 
 
 Containers
 
 AC                  ari-collection      leaf-list
+                                        * "config true" values are unique
+                                          (is this an acceptable constraint?)
+                                        REPORT-ON has default destinations
+                                        * leaf-list can only have one default value
+                                        * Create amm:default-values, for multiple
+                                          values?
+                                        ordered-by system by default
+
+                                        === ALTERNATIVE ===
+
+                                        extension amm:collection {
+                                            values [1,2,1,3];
+                                        }
+
+
 AM                  ari-map             list
 TBL                 ari-tbl             list OR leaf-list or amm:tbl
 
-EXECSET             exec-set            grouping { leaf nonce;
-                                                   leaf-list ari;
-                                                 }
+NONCE               ---                 typedef amm:nonce {
+                                          union {
+                                            type empty;
+                                            type uint32;
+                                            type binary;
+                                          }
+                                        }
 
-RPTSET              rpt-set             grouping { leaf nonce;
-                                                   leaf tp-val;
-                                                   list { leaf td-val;
-                                                          leaf ari;
-                                                          leaf-list ari;
-                                                        }
-                                                 }
+EXECSET             exec-set            grouping exec-set {
+                                          container exec-set {
+                                            leaf nonce {
+                                              type amm:nonce;
+                                            }
+                                            amm:collection targets {
+                                              type amm:ari;
+                                            }
+                                          }
+                                        }
+
+RPTSET              rpt-set             grouping rpt-set {
+                                          container rpt-set {
+                                            leaf nonce {
+                                              type nonce;
+                                            }
+                                            leaf reference-time {
+                                              type amm:time;
+                                            }
+                                            list rpt-list {
+                                              key creation-time;
+                                              leaf creation-time {
+                                                type amm:offset;
+                                              }
+                                              leaf source {
+                                                type amm:ari;
+                                              }
+                                              amm:collection rpt-items {
+                                                type amm:ari;
+                                              }
+                                            }
+                                          }
+                                        }
