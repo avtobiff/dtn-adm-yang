@@ -1,0 +1,310 @@
+draft-ietf-dtn-ari-00 Section 3.2
+
+References
+
+RFC 9254
+
+
+AMM Literal Type    Used CBOR Type      Suggested YANG type
+
+NULL                null                empty (RFC 9254 CBOR null -> empty)
+BOOL                bool                bool
+BYTE                uint                amm:byte OR uint8
+INT                 int                 int32
+UINT                uint                uint32
+VAST                int                 int64
+UVAST               uint                uint64
+REAL32              float               amm:real32
+                                        CBOR major type 7, 5-bit value 26
+                                        RFC 8949 Section 3.3 Table 3
+REAL64              float               amm:real64
+                                        CBOR major type 7, 5-bit value 27
+                                        RFC 8949 Section 3.3 Table 3
+TEXTSTR             tstr                string
+BYTESTR             bstr                binary
+
+
+Non-primitive types
+
+ARI                 ari                 typedef amm:ari {
+                                          type string {
+                                            pattern "^ari:.*";
+                                          }
+                                          description
+                                            "Text encoded ARI.";
+                                        }
+
+TP                  lit-time            typedef amm:time {
+                                          type uint64;
+                                          description
+                                            "DTN Time
+
+                                             An unsigned integer representing
+                                             number of milliseconds since the
+                                             DTN Epoch 2000-01-01T00:00:00Z.
+
+                                             Not affected by leap second";
+                                          reference
+                                            "RFC 9171: Bundle Protocol Version 7,
+                                             Section 4.2.6 DTN Time";
+                                        }
+
+                                        // alternative name?
+                                        // typedef amm:dtn-time
+
+                                        === ALTERNATIVES ===
+
+                                        ietf-yang-types:date-and-time OR
+                                        amm:date-and-time with normative text
+
+TD                  lit-time            === SIMPLE ALTERNATIVE ===
+
+                                        typedef amm:offset {
+                                          units "nanoseconds";
+                                          type decimal64 {
+                                            fraction-digits 9;
+                                          }
+                                        }
+
+                                        === CURRENT DRAFT DEFINITION ===
+
+                                        typedef amm:offset {
+                                          description
+                                            "Either Human friendly duration
+                                             notation with leading + or - sign,
+                                             or float or int with max 64 bit
+                                             signed integer number of nanoseconds.
+
+                                             Human friendly duration notation from
+                                             RFC 3339 Appendix A, with a leading
+                                             plus or minus sign.
+
+                                             The components year and month from
+                                             RFC 3339 duration SHALL not be used.";
+                                          }
+                                          union {
+                                            type string {
+                                              pattern "^(\+|-)?P(?!$)((\d+D)?(T(?!\d+H\d+S)(\d+H)?(\d+M)?(\d+S)?)?)$";
+                                              //pattern "^(\+|-)?P(?!$)((\d+W)$|(?!.*W)(?!\d+Y\d+D)(\d+Y)?(\d+M)?(\d+D)?(T(?!\d+H\d+S)(\d+H)?(\d+M)?(\d+S)?)?)$";
+                                              reference "RFC 3339";
+                                            type amm:real64;
+                                            type int64;
+                                        }
+
+
+LABEL               lit-label           typedef amm:label {
+                                          type union {
+                                            type string {
+                                              pattern
+                                                "!?[A-Za-z_][A-Za-z0-9_\-\.]*";
+                                            }
+                                            type int32;
+                                          }
+                                        }
+
+CBOR                lit-cbor            typedef amm:cbor {
+                                          type binary;
+                                          description
+                                            "Arbitrary CBOR content.
+
+                                             Note the content is CBOR as defined
+                                             in RFC 8949, no constraints from
+                                             RFC 9254 are in effect.";
+                                        }
+
+
+Containers
+
+AC                  ari-collection      leaf-list
+                                        * "config true" values are unique
+                                          (is this an acceptable constraint?)
+                                        REPORT-ON has default destinations
+                                        * leaf-list can only have one default value
+                                        * Create amm:default-values, for multiple
+                                          values?
+                                        ordered-by system by default
+
+                                        === ALTERNATIVE ===
+
+                                        extension amm:collection {
+                                            values [1,2,1,3];
+                                        }
+
+
+AM                  ari-map             list
+TBL                 ari-tbl             list OR leaf-list or amm:tbl
+
+NONCE               ---                 typedef amm:nonce {
+                                          type union {
+                                            type empty;
+                                            type uint32;
+                                            type binary;
+                                            /* ace.typing.py:
+                                               type binary;
+                                               type uint64;
+                                               type null;
+                                              */
+                                          }
+                                        }
+
+EXECSET             exec-set            grouping exec-set {
+                                          container exec-set {
+                                            leaf nonce {
+                                              type amm:nonce;
+                                            }
+                                            amm:collection targets {
+                                              type amm:ari;
+                                            }
+                                          }
+                                        }
+
+RPTSET              rpt-set             grouping rpt-set {
+                                          container rpt-set {
+                                            leaf nonce {
+                                              type nonce;
+                                            }
+                                            leaf reference-time {
+                                              type amm:time;
+                                            }
+                                            list rpt-list {
+                                              key creation-time;
+                                              leaf creation-time {
+                                                type amm:offset;
+                                              }
+                                              leaf source {
+                                                type amm:ari;
+                                              }
+                                              amm:collection rpt-items {
+                                                type amm:ari;
+                                              }
+                                            }
+                                          }
+                                        }
+
+
+
+---
+
+
+CONST                                   amm:const pi32 {
+                                          type amm:uint;
+                                          value 3.141592;
+                                        }
+
+                                        pro: shorter, less extensions
+                                        con: less tooling support
+
+                                        use it as a ari type?
+
+                                        OR
+
+                                        leaf pi32 {
+                                          type amm:uint;
+                                          amm:constant;
+                                          amm:value 3.141592 // or reuse default?
+                                        }
+
+                                        pro: yang native, tool support, use it
+                                             as a yang native leafref
+                                        con: one extra SLOC
+
+TYPEDEF                                 typedef <ident> {
+                                          type <type>;
+                                        }
+
+IDENT                                   identity my-ident {
+                                          base my-base;
+                                        }
+
+                                        identity parameterized-ident {
+                                          base my-ident;
+                                          amm:parameters {
+                                            leaf my-value {
+                                              type amm:uint;
+                                            }
+                                          }
+                                        }
+
+                                        use it as an identityref?
+
+EDD                                     leaf tx-bundles {
+                                          config false;
+                                          type amm:uint;
+                                        }
+
+                                        leaf rx-bundles {
+                                          config false;
+                                          type amm:uint;
+                                          // parameters as attributes
+                                          amm:parameters {
+                                            leaf proto {
+                                              type enumeration {
+                                                enum ctrl;
+                                                enum telemetry;
+                                              }
+                                            }
+                                          }
+                                        }
+
+                                        amm:collection {
+                                          type leafref {
+                                            "../tx-bundles";
+                                        }
+
+OPER                                    typedef numeric {
+                                          type union {
+                                            type ari:int;
+                                            type ari:uint;
+                                            type ari:vast;
+                                            type ari:uvast;
+                                            type ari:real32;
+                                            type ari:real64;
+                                          }
+                                        }
+
+                                        amm:oper add {
+                                          input {
+                                            leaf val-a {
+                                              type numeric;
+                                            }
+                                            leaf val-b {
+                                              type numeric;
+                                            }
+                                          }
+                                          output {
+                                            leaf sum {
+                                              type numeric;
+                                            }
+                                          }
+                                        }
+
+                                        amm:oper sum {
+                                          input {
+                                            leaf count {
+                                              type ari:uint {
+                                                range "1..max";
+                                              }
+                                            }
+                                            amm:collection operand {
+                                              type ari:uint;
+                                            }
+                                          }
+                                          output {
+                                            leaf sum {
+                                              type numeric;
+                                            }
+                                          }
+                                        }
+
+CTRL                                    rpc with normative text? amm:ctrl?
+
+SBR                                     rpc w/ text? amm:sbr?
+
+TBR                                     rpc w/ text? amm:tbr?
+
+VAR                                     leaf my-var {
+                                          //config true; // implicit
+                                          type amm:uint;
+                                        }
+
+                                        Use as leafref

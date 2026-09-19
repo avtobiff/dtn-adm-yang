@@ -1,0 +1,275 @@
+SURVEY OF AMM COMPLEX TYPES FOR ADM-YANG
+========================================
+
+SEMANTIC TYPES
+--------------
+
+
+Need to be represented as typedef.
+
+
+* amm:type -> YANG native "type"
+
+
+* amm:typedef -> YANG native "typedef"
+
+
+* amm:ulist
+  UL: Uniform List
+
+  Use YANG "leaf-list", but with multiple values allowed. (Maybe w/ "amm:ulist"
+  extension to explicitly signal the difference from a leaf-list?)
+  * Pro: Mostly standard YANG
+  * Con: Different in maybe unexpected ways.
+
+    leaf-list ll {
+      amm:ulist;
+      ...
+    }
+
+    amm:ulist ll {
+      ...
+    }
+
+
+
+
+grouping my-ulist {
+  type amm:int;
+}
+
+uses my-ulist;
+
+list my-umap {
+  uses my-ulist;
+}
+
+
+
+
+
+* amm:ulist
+* amm:dlist
+  DL: Diverse List
+
+  Keep definition since it is special.
+
+
+* amm:umap
+  UM: Uniform Map
+
+  Use YANG "list" with the "amm:umap" extension to signal the UM semantic type
+  to be used
+
+    list my-umap {
+      amm:umap;
+      key um-key;
+      leaf um-key { type string; }
+      leaf um-value { type binary; }
+    }
+
+
+    typedef my-umap2 {
+      list my-umap {
+        amm:umap;
+        key um-key;
+        leaf um-key { type string; }
+        leaf um-value { type binary; }
+      }
+    }
+
+    typedef my-umap3 {
+      type amm:umap {
+        amm:key { type string; };
+        amm:value { type amm:ulist/amm:ari/amm:umap; }
+      }
+    }
+
+
+* amm:tblt
+  TBLT
+
+  Use YANG "list" with the "amm:tblt" extension to signal the TBLT semantic
+  type to be used. Use "leaf" for columns.
+
+    // option 1
+    list my-t {
+      amm:tblt;
+      key t-key;
+      leaf t-key { type string; }
+      leaf t-value { type binary; }
+    }
+
+  -> Named elements are AMM objects not AMM values.
+
+    Using YANG "list" and "unique" statements map directly to the semantics
+    defined for AMM and ADM-YANG.
+
+    // option 2
+    list my-t2 {
+      amm:tblt;
+      key t2-key;
+      unique "t2-binval t2-intval";
+      leaf t2-key { type string; }
+      leaf t2-binval { type binary; }
+      leaf t2-intval { type amm:int; }
+    }
+
+    // option 3
+    typedef my-tblt3 {
+      type amm:tblt {
+        key t3-key;
+        unique "t2-binval t2-intval";
+        leaf t3-key { type string; }
+        leaf t3-binval { type binary; }
+        leaf t3-intval { type amm:int; }
+      }
+    }
+
+  -> Option 3 hits the sweet spot of keeping native YANG semantics while also
+     mapping the ADM semantics adequately.
+
+
+* amm:union -> "union"
+
+  Type matching works similarly enough to YANG to just use "union", as defined
+  in dtn-amm.
+
+
+* amm:seq
+
+  Keep definition since it is special.
+
+
+OBJECT TYPES
+------------
+
+* amm:ident
+  IDENT: Identity Object
+
+  YANG "identity" with some tunings:
+
+  * "amm:abstract" (boolean) extension to show that the identity is abstract
+  * "amm:parameter"
+
+
+
+
+OBJECT LIFECYCLE
+----------------
+
+draft-ietf-dtn-amm Section 7.16 Object lifecycle. It would be good to
+align with RFC 7950 Section 11 and also
+draft-ietf-netmod-yang-module-versioning Section 3.1.1 on "status"
+BC/NBC changes.
+
+RFC 7950 Section 11. Updating a Module
+
+   o  A "status" statement may be added, or changed from "current" to
+      "deprecated" or "obsolete", or changed from "deprecated" to
+      "obsolete".
+
+draft-ietf-netmod-yang-module-versioning
+Section 3.1.1. Backwards-compatible rules
+
+   *  A "status" "deprecated" statement MAY be added, or changed from
+      "current" to "deprecated", but adding or changing "status" to
+      "obsolete" is a non-backwards-compatible change.  See [RFC9907]
+      and Section 6.1.1 for guidance.
+
+   *  YANG schema nodes with a "status" "obsolete" substatement MAY be
+      removed from published modules, and the removal is classified as a
+      backwards-compatible change.  In some circumstances it MAY be
+      helpful to retain the obsolete definitions since their identifiers
+      may still be referenced by other modules and to ensure that their
+      identifiers are not reused with a different meaning.
+
+Also note the following bullet point directly after the two above
+
+   *  A statement that is defined using the YANG "extension" statement
+      may be added, removed, or changed.  While extensions may be
+      ignored by some clients, other clients may support a given
+      extension and thus be affected if a module adds, removes or
+      changes how it uses the extension statement.  Therefore, extension
+      statement definitions SHOULD specify whether adding, removing, or
+      changing statements defined by that extension are considered
+      backwards-compatible or non-backwards-compatible.
+
+I have a few modification suggestions:
+
+1) Bullet point 3: Changing status from "deprecated" to "obsolete" is
+   defined as a non-backwards-compatible change.
+
+2) Bullet point 3: Mention that status "obsolete" objects might be
+   removed, this is a backwards-compatible change.
+
+3) It would be good to define BC/NBC rules for the extensions defined in
+   ADM-YANG. (Not presented below, bigger overhaul needed.)
+
+
+Suggested text changes
+
+## draft-ietf-dtn-amm:
+
+OLD:
+
+   Within a single model (whether ADM or ODM) each object has a well-
+   defined life cycle described below.
+
+   (...)
+
+   3.  Finally, a later revision the object will change to "obsolete"
+       status and become unusable, the model definition will continue to
+       exist for historical reference to a user but it has no further
+       meaning to an Agent.
+
+NEW:
+
+   Within a single model (whether ADM or ODM) each object has a well-
+   defined life cycle described below.
+
+   For the ADM YANG implementation [I-D.dtn-adm-yang], see Section 11 of
+   [RFC7950] and Section 3.1.1 of [I-D.netmod-yang-module-versioning].
+
+   (...)
+
+   3.  Finally, a later revision will change the object to "obsolete"
+       status and become unusable, the model definition will continue to
+       exist for historical reference to a user but it has no further
+       meaning to an Agent. Note that changing status from "deprecated"
+       to "obsolete" is a non-backwards-compatible change. However,
+       removing an object which has status "obsolete" is a
+       backwards-compatible change.
+
+
+## draft-ietf-dtn-adm-yang
+
+OLD:
+
+4.1. Direct Reuse
+
+(...)
+
+   Documentation Statements:  The existing status, description, and
+      reference statements are unchanged from their definitions in
+      Sections 7.21.2, 7.21.3, and Section 7.21.4 of [RFC7950]
+      respectively.
+
+NEW:
+
+   Documentation Statements:  The existing description, and
+      reference statements are unchanged from their definitions in
+      Sections 7.21.3, and 7.21.4 of [RFC7950] respectively.
+
+   Status Statement: The existing status statement is unchanged from its
+   definition in Sections 7.21.2 of [RFC7950]. Note that the
+   backwards-compatible rules defined in Section 11 of [RFC7950] and
+   Section 3.1.1 of [I-D.ietf-netmod-yang-module-versioning] are
+   followed.
+
+
+Perhaps a section in dtn-adm-yang should be added, i.e. "Updating an ADM
+YANG module" with references to RFC 7950 Section 11 and
+I-D.ietf-netmod-yang-module-versioning Section 3.1.1 in addition to
+rules for all amm extensions with regards backwards compatibility when
+updating them.
