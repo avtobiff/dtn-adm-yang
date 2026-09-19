@@ -135,10 +135,15 @@ AM                  ari-map             list
 TBL                 ari-tbl             list OR leaf-list or amm:tbl
 
 NONCE               ---                 typedef amm:nonce {
-                                          union {
+                                          type union {
                                             type empty;
                                             type uint32;
                                             type binary;
+                                            /* ace.typing.py:
+                                               type binary;
+                                               type uint64;
+                                               type null;
+                                              */
                                           }
                                         }
 
@@ -175,3 +180,131 @@ RPTSET              rpt-set             grouping rpt-set {
                                             }
                                           }
                                         }
+
+
+
+---
+
+
+CONST                                   amm:const pi32 {
+                                          type amm:uint;
+                                          value 3.141592;
+                                        }
+
+                                        pro: shorter, less extensions
+                                        con: less tooling support
+
+                                        use it as a ari type?
+
+                                        OR
+
+                                        leaf pi32 {
+                                          type amm:uint;
+                                          amm:constant;
+                                          amm:value 3.141592 // or reuse default?
+                                        }
+
+                                        pro: yang native, tool support, use it
+                                             as a yang native leafref
+                                        con: one extra SLOC
+
+TYPEDEF                                 typedef <ident> {
+                                          type <type>;
+                                        }
+
+IDENT                                   identity my-ident {
+                                          base my-base;
+                                        }
+
+                                        identity parameterized-ident {
+                                          base my-ident;
+                                          amm:parameters {
+                                            leaf my-value {
+                                              type amm:uint;
+                                            }
+                                          }
+                                        }
+
+                                        use it as an identityref?
+
+EDD                                     leaf tx-bundles {
+                                          config false;
+                                          type amm:uint;
+                                        }
+
+                                        leaf rx-bundles {
+                                          config false;
+                                          type amm:uint;
+                                          // parameters as attributes
+                                          amm:parameters {
+                                            leaf proto {
+                                              type enumeration {
+                                                enum ctrl;
+                                                enum telemetry;
+                                              }
+                                            }
+                                          }
+                                        }
+
+                                        amm:collection {
+                                          type leafref {
+                                            "../tx-bundles";
+                                        }
+
+OPER                                    typedef numeric {
+                                          type union {
+                                            type ari:int;
+                                            type ari:uint;
+                                            type ari:vast;
+                                            type ari:uvast;
+                                            type ari:real32;
+                                            type ari:real64;
+                                          }
+                                        }
+
+                                        amm:oper add {
+                                          input {
+                                            leaf val-a {
+                                              type numeric;
+                                            }
+                                            leaf val-b {
+                                              type numeric;
+                                            }
+                                          }
+                                          output {
+                                            leaf sum {
+                                              type numeric;
+                                            }
+                                          }
+                                        }
+
+                                        amm:oper sum {
+                                          input {
+                                            leaf count {
+                                              type ari:uint {
+                                                range "1..max";
+                                              }
+                                            }
+                                            amm:collection operand {
+                                              type ari:uint;
+                                            }
+                                          }
+                                          output {
+                                            leaf sum {
+                                              type numeric;
+                                            }
+                                          }
+                                        }
+
+CTRL                                    rpc with normative text? amm:ctrl?
+
+SBR                                     rpc w/ text? amm:sbr?
+
+TBR                                     rpc w/ text? amm:tbr?
+
+VAR                                     leaf my-var {
+                                          //config true; // implicit
+                                          type amm:uint;
+                                        }
+
+                                        Use as leafref
