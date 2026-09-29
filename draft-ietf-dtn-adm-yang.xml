@@ -41,6 +41,12 @@
         <email>Justin.Ethier@jhuapl.edu</email>
       </address>
     </author>
+    <author fullname="Per Andersson" initials="P." surname="Andersson">
+      <organization>Ionio Systems</organization>
+      <address>
+        <email>per.ietf@ionio.se</email>
+      </address>
+    </author>
     <date/>
     <area>Transport</area>
     <workgroup>Delay-Tolerant Networking</workgroup>
