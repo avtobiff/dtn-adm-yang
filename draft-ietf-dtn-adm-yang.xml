@@ -800,7 +800,7 @@ amm:ulist {
   type ari:uint;
 }
 amm:ulist {
-  type "/aritype/uint" {
+  type ari:uint {
     range "3..10";
     units "meter";
   }
@@ -870,15 +870,15 @@ Examples of the "amm:dlist" statement are below, one as simple structure and the
           <sourcecode type="yang">
 amm:dlist {
   // each "type" substatement is one element of the AC
-  type "/aritype/uint";
-  type "/aritype/uint";
+  type ari:uint;
+  type ari:uint;
 }
 amm:dlist {
   // first AC element is text
-  type "/aritype/textstr";
+  type ari:textstr;
   // remaining 2-10 element are int
   amm:seq {
-    type "/aritype/int";
+    type ari:int;
     min-elements 2;
     max-elements 10;
   }
@@ -976,17 +976,17 @@ amm:umap {
   description
     "restrict only keys";
   amm:keys {
-    type "/aritype/uint";
+    type ari:uint;
   }
 }
 amm:umap {
   description
     "Map uint to text values.";
   amm:keys {
-    type "/aritype/uint";
+    type ari:uint;
   }
   amm:values {
-    type "/aritype/textstr";
+    type ari:textstr;
   }
 }
 </sourcecode>
@@ -1045,10 +1045,10 @@ Examples of the "amm:tblt" statement are below.
           <sourcecode type="yang">
 amm:tblt {
   amm:column first {
-    type "/aritype/uint";
+    type ari:uint;
   }
   amm:column second {
-    type "/aritype/textstr";
+    type ari:textstr;
   }
   amm:key "first";
 }
@@ -1175,15 +1175,15 @@ Examples of the "union" statement are below, some as simple use and some as rest
 union {
   description
     "an optional int";
-  type "/aritype/int";
-  type "/aritype/null";
+  type ari:int;
+  type ari:null;
 }
 union {
-  type "/aritype/uint" {
+  type ari:uint {
     range "3..10";
     units "meter";
   }
-  type "/aritype/textstr";
+  type ari:textstr;
 }
 </sourcecode>
         </section>
@@ -1256,9 +1256,9 @@ Examples of the "seq" statement are below.
           </t>
           <sourcecode type="yang">
 amm:dlist {
-  type "/aritype/textstr";
+  type ari:textstr;
   amm:seq {
-    type "/aritype/uint";
+    type ari:uint;
     min-elements 1;
   }
 }
@@ -1339,17 +1339,17 @@ An example of the "parameter" statement is below, where there are three defined 
         </t>
         <sourcecode type="yang">
   amm:parameter first {
-    type "/aritype/uint" {
+    type ari:uint {
       range "3..10";
     }
   }
   amm:parameter second {
-    type "/aritype/textstr";
+    type ari:textstr;
     amm:default "\"value\"";
   }
   amm:parameter third {
     amm:ulist {
-      type "/aritype/uint";
+      type ari:uint;
     }
     amm:default "/AC/(3,5,8)"
   }
@@ -1443,14 +1443,14 @@ Examples of the "typedef" statement are below, some as restriction and some as u
   typedef restricted-uint {
     description
       "Example restriction";
-    type "/aritype/uint" {
+    type ari:uint {
       range "3..10";
     }
   }
   typedef annotated-uint {
     description
       "Example units annotation";
-    type "/aritype/uint" {
+    type ari:uint {
       units "meter";
     }
   }
@@ -1458,7 +1458,7 @@ Examples of the "typedef" statement are below, some as restriction and some as u
     description
       "Example units on AC items";
     amm:ulist {
-      type "/aritype/real32";
+      type ari:real32;
       amm:units "meter";
       min-elements 3;
       max-elements 10;
@@ -1550,7 +1550,7 @@ An example of a multiple-base hierarchy of IDENT objects is below.
   amm:ident use-3 {
     amm:base "./IDENT/base-b";
     amm:parameter option {
-      type "/aritype/int";
+      type ari:int;
     }
     description
       "An identity derived from base-b which includes a parameter.";
@@ -1670,7 +1670,7 @@ An example of a simple-typed CONST is below.
         </t>
         <sourcecode type="yang">
   amm:const pi32 {
-    type "/aritype/real32";
+    type ari:real32;
     amm:init-value "3.14159";
     description
       "A truncated value of Pi.";
@@ -1993,7 +1993,7 @@ Also note the anonymous semantic type used to restrict the parameter.
     parameter count {
       description
         "The number of operands to pop."
-      type "/aritype/uint" {
+      type ari:uint {
         range "1..max";
       }
     }
@@ -2330,7 +2330,7 @@ An example of a simple-typed VAR with an initializer value is below.
   amm:var min_threshold {
     description
       "The lower threshold to enable safe mode.";
-    type "/aritype/real32" {
+    type ari:real32 {
       units "meter";
     }
     amm:init-value "1e4";
@@ -3882,7 +3882,7 @@ Specific networking technologies and protocols can derive from the abstract base
                  and Recommendations
        RFC 5017: MIB Textual Conventions for Uniform Resource
                  Identifiers (URIs)";
-    type "/aritype/textstr" {
+    type ari:textstr {
       // This pattern is on the normalized scheme
       pattern '[a-z][a-z0-9+-.]*:.*';
     }
@@ -3905,7 +3905,7 @@ Specific networking technologies and protocols can derive from the abstract base
        as defined in Section 4 of RFC 9562.";
     reference
       "RFC 9562: Universally Unique IDentifiers (UUIDs)";
-    type "/aritype/bytestr" {
+    type ari:bytestr {
       length "16";
     }
   }
@@ -3941,7 +3941,7 @@ Specific networking technologies and protocols can derive from the abstract base
        ITU-T X.690-2021: ASN.1 encoding rules: Specification of
          Basic Encoding Rules (BER), Canonical Encoding
          Rules (CER) and Distinguished Encoding Rules (DER)";
-    type "/aritype/bytestr" {
+    type ari:bytestr {
       length "2..max";
     }
   }
@@ -3963,7 +3963,7 @@ Specific networking technologies and protocols can derive from the abstract base
     description
       "A value which references a non-abstract derived object
        for specific types of network or transport endpoints.";
-    type "/aritype/ident" {
+    type ari:ident {
       amm:base "./IDENT/abstract-endpoint";
     }
   }
@@ -4237,7 +4237,7 @@ This includes the following:
       description
         "If true, listings will include objects from ADMs";
       amm:default "false";
-      type "/aritype/BOOL";
+      type ari:bool;
     }
   }
 
@@ -4256,7 +4256,7 @@ This includes the following:
     amm:parameter namespace {
       description
         "The parent ODM namespace.";
-      type "/aritype/namespace";
+      type ari:namespace;
     }
     amm:parameter obj-name {
       description
@@ -4392,7 +4392,7 @@ This includes the following:
     amm:operand val {
       description
         "The single value.";
-      type "/aritype/BOOL";
+      type ari:bool;
     }
   }
 
@@ -4402,12 +4402,12 @@ This includes the following:
     amm:operand left {
       description
         "The left-side operand.";
-      type "/aritype/BOOL";
+      type ari:bool;
     }
     amm:operand right {
       description
         "The left-side operand.";
-      type "/aritype/BOOL";
+      type ari:bool;
     }
   }
 
@@ -4417,7 +4417,7 @@ This includes the following:
     amm:result result {
       description
         "The single value.";
-      type "/aritype/BOOL";
+      type ari:bool;
     }
   }
 
@@ -4430,7 +4430,7 @@ This includes the following:
         "The list of other predicate operators to evaluate and
          combine their results.";
       amm:ulist {
-        type "/aritype/oper";
+        type ari:oper;
       }
     }
     amm:operand value {
@@ -4442,7 +4442,7 @@ This includes the following:
     amm:result combined {
       description
         "The combined boolean result.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
 
@@ -4451,13 +4451,13 @@ This includes the following:
     amm:enum 0;
     description
       "The vendor for this Agent implementation.";
-    type "/aritype/TEXTSTR";
+    type ari:textstr;
   }
   amm:edd sw-version {
     amm:enum 1;
     description
       "The version for this Agent implementation.";
-    type "/aritype/TEXTSTR";
+    type ari:textstr;
   }
   amm:edd capability {
     amm:enum 2;
@@ -4468,33 +4468,33 @@ This includes the following:
       amm:column org-name {
         description
           "The organization name containing the ADM";
-        type "/aritype/TEXTSTR";
+        type ari:textstr;
       }
       amm:column org-enum {
         description
           "The organization enumeration containing the ADM";
-        type "/aritype/VAST";
+        type ari:vast;
       }
       amm:column model-name {
         description
           "The model name of the ADM";
-        type "/aritype/TEXTSTR";
+        type ari:textstr;
       }
       amm:column model-enum {
         description
           "The model enumeration of the ADM";
-        type "/aritype/VAST";
+        type ari:vast;
       }
       amm:column revision {
         description
           "The specific revision the agent supports.";
-        type "/aritype/TEXTSTR";
+        type ari:textstr;
       }
       amm:column features {
         description
           "The features of the ADM which the agent supports.";
         amm:ulist {
-          type "/aritype/TEXTSTR";
+          type ari:textstr;
         }
       }
     }
@@ -4542,7 +4542,7 @@ This includes the following:
     description
       "A timestamp on the Agent when the latest AMP message was
        received from any manager.";
-    type "/aritype/TP";
+    type ari:tp;
   }
 
   // Execution counters and states
@@ -4586,7 +4586,7 @@ This includes the following:
            table rows over time.
            An implementation MAY assign values from a smaller
            domain than this column can represent.";
-        type "/aritype/UVAST";
+        type ari:uvast;
       }
       amm:column target {
         description
@@ -4597,7 +4597,7 @@ This includes the following:
       amm:column state {
         description
           "The state of executing the target within the Agent.";
-        type "/aritype/BYTE" {
+        type ari:byte {
           amm:int-labels {
             enum waiting {
               value 0;
@@ -4637,7 +4637,7 @@ This includes the following:
       amm:default "null";
       union {
         type "//ietf/amm-base/typedef/exec-tgt";
-        type "/aritype/NULL";
+        type ari:null;
       }
     }
     amm:parameter on-falsy {
@@ -4647,13 +4647,13 @@ This includes the following:
       amm:default "null";
       union {
         type "//ietf/amm-base/typedef/exec-tgt";
-        type "/aritype/NULL";
+        type ari:null;
       }
     }
     amm:result branch {
       description
         "Indication of which branch was executed.";
-      type "/aritype/BOOL";
+      type ari:bool;
     }
   }
   amm:ctrl catch {
@@ -4673,13 +4673,13 @@ This includes the following:
       amm:default "null";
       union {
         type "//ietf/amm-base/typedef/exec-tgt";
-        type "/aritype/NULL";
+        type ari:null;
       }
     }
     amm:result try-success {
       description
         "True if the try target succeeded without exception.";
-      type "/aritype/BOOL";
+      type ari:bool;
     }
   }
   amm:ctrl exec-deadline {
@@ -4700,7 +4700,7 @@ This includes the following:
       description
         "The relative of time on the Agent to wait for
          the target to finish executing.";
-      type "/aritype/TD";
+      type ari:td;
     }
     amm:parameter on-timeout {
       description
@@ -4708,7 +4708,7 @@ This includes the following:
       amm:default "null";
       union {
         type "//ietf/amm-base/typedef/exec-tgt";
-        type "/aritype/NULL";
+        type ari:null;
       }
     }
     amm:result success {
@@ -4717,7 +4717,7 @@ This includes the following:
          deadline, false if the execution did not finish before,
          and undefined if the execution failed before the
          deadline.";
-      type "/aritype/BOOL";
+      type ari:bool;
     }
   }
   amm:ctrl wait-for {
@@ -4731,7 +4731,7 @@ This includes the following:
     amm:parameter duration {
       description
         "The relative of time on the Agent to wait for.";
-      type "/aritype/TD";
+      type ari:td;
     }
   }
   amm:ctrl wait-until {
@@ -4746,7 +4746,7 @@ This includes the following:
     amm:parameter time {
       description
         "The absolute Agent time at which to stop waiting.";
-      type "/aritype/TP";
+      type ari:tp;
     }
   }
   amm:ctrl wait-cond {
@@ -4772,8 +4772,8 @@ This includes the following:
          be used.";
       amm:default "null";
       union {
-        type "/aritype/TD";
-        type "/aritype/NULL";
+        type ari:td;
+        type ari:null;
       }
     }
   }
@@ -4861,7 +4861,7 @@ This includes the following:
       amm:column revision {
         description
           "The specific revision the agent supports.";
-        type "/aritype/TEXTSTR";
+        type ari:textstr;
       }
     }
   }
@@ -4908,7 +4908,7 @@ This includes the following:
     amm:parameter odm-ns {
       description
         "Namespace of the ODM";
-      type "/aritype/namespace";
+      type ari:namespace;
     }
   }
 
@@ -4920,7 +4920,7 @@ This includes the following:
     amm:parameter target {
       description
         "The VAR object to affect.";
-      type "/aritype/VAR";
+      type ari:var;
     }
   }
   amm:ctrl var-store {
@@ -4930,7 +4930,7 @@ This includes the following:
     amm:parameter target {
       description
         "The VAR object to affect.";
-      type "/aritype/VAR";
+      type ari:var;
     }
     amm:parameter value {
       description
@@ -4955,7 +4955,7 @@ This includes the following:
          list (when true), or only non-abstract objects (when
          false).";
       amm:default "false";
-      type "/aritype/bool";
+      type ari:bool;
     }
     amm:parameter base {
       description
@@ -4966,17 +4966,17 @@ This includes the following:
          itself, so it SHALL NOT be present in the produced list.";
       amm:default "null";
       union {
-        type "/aritype/ident";
-        type "/aritype/null";
+        type ari:ident;
+        type ari:null;
       }
     }
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        type "/aritype/ident";
+        type ari:ident;
       }
       amm:column is-abstract {
-        type "/aritype/bool";
+        type ari:bool;
       }
     }
   }
@@ -4994,13 +4994,13 @@ This includes the following:
       description
         "If true the object is abstract and SHALL NOT contain any
          formal parameters.";
-      type "/aritype/bool";
+      type ari:bool;
     }
     amm:parameter bases {
       description
         "The set of base objects for this object.";
       amm:ulist {
-        type "/aritype/ident";
+        type ari:ident;
       }
     }
     uses ensure-object-params;
@@ -5013,7 +5013,7 @@ This includes the following:
     amm:parameter obj {
       description
         "A reference to a IDENT within an ODM only.";
-      type "/aritype/IDENT";
+      type ari:IDENT;
     }
   }
 
@@ -5026,7 +5026,7 @@ This includes the following:
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        type "/aritype/typedef";
+        type amm:typedef;
       }
     }
   }
@@ -5040,7 +5040,7 @@ This includes the following:
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        type "/aritype/CONST";
+        type ari:const;
       }
       amm:column type {
         type "//ietf/amm-semtype/typedef/semtype";
@@ -5107,7 +5107,7 @@ This includes the following:
     amm:parameter obj {
       description
         "A reference to a CONST within an ODM only.";
-      type "/aritype/CONST";
+      type ari:const;
     }
   }
 
@@ -5120,7 +5120,7 @@ This includes the following:
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        type "/aritype/VAR";
+        type ari:var;
       }
       amm:column type {
         type "//ietf/amm-semtype/typedef/semtype";
@@ -5162,7 +5162,7 @@ This includes the following:
     amm:parameter obj {
       description
         "A reference to a VAR within an ODM only.";
-      type "/aritype/VAR";
+      type ari:var;
     }
   }
 
@@ -5176,7 +5176,7 @@ This includes the following:
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        type "/aritype/SBR";
+        type ari:sbr;
       }
       amm:column action {
         description
@@ -5196,13 +5196,13 @@ This includes the following:
            the action.
            This can also be used by an Agent to limit how frequently
            the condition is evaluated.";
-        type "/aritype/TD";
+        type ari:td;
       }
       amm:column max-count {
         description
           "Number of executions of the action, after being enabled,
            when the rule is disabled.";
-        type "/aritype/UVAST";
+        type ari:uvast;
       }
       amm:column init-enabled {
         description
@@ -5225,7 +5225,7 @@ This includes the following:
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        type "/aritype/TBR";
+        type ari:tbr;
       }
       amm:column action {
         description
@@ -5242,13 +5242,13 @@ This includes the following:
       amm:column period {
         description
           "How often the action is executed.";
-        type "/aritype/TD";
+        type ari:td;
       }
       amm:column max-count {
         description
           "Number of executions of the action, after being enabled,
            when the rule is disabled.";
-        type "/aritype/UVAST";
+        type ari:uvast;
       }
       amm:column init-enabled {
         description
@@ -5621,7 +5621,7 @@ This includes the following:
     amm:result match {
       description
         "True if and only if the value is the undefined value.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper is-not-undefined {
@@ -5636,7 +5636,7 @@ This includes the following:
     amm:result match {
       description
         "False if and only if the value is the undefined value.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper is-truthy {
@@ -5655,7 +5655,7 @@ This includes the following:
     amm:result match {
       description
         "True if and only if the value is truthy.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper match-type {
@@ -5671,8 +5671,8 @@ This includes the following:
       description
         "The desired type to match against.";
       union {
-        type "/aritype/aritype";
-        type "/aritype/typedef";
+        type ari:aritype;
+        type ari:typedef;
       }
     }
     amm:operand value {
@@ -5683,7 +5683,7 @@ This includes the following:
     amm:result match {
       description
         "True if and only if the value matches the desired type.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper convert-type {
@@ -5700,8 +5700,8 @@ This includes the following:
       description
         "The desired type to convert to.";
       union {
-        type "/aritype/aritype";
-        type "/aritype/typedef";
+        type ari:aritype;
+        type ari:typedef;
       }
     }
     amm:operand value {
@@ -5730,17 +5730,17 @@ This includes the following:
          In accordance with that definition, this pattern is
          implicitly anchored to the start and end of the text being
          matched (i.e. it is always a full match).";
-      type "/aritype/textstr";
+      type ari:textstr;
     }
     amm:operand value {
       description
         "The value to check for a match.";
-      type "/aritype/textstr";
+      type ari:textstr;
     }
     amm:result is-match {
       description
         "The result is true if the value matches the given pattern.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper is-org-private {
@@ -5755,14 +5755,14 @@ This includes the following:
         "The reference value to check.
          This value SHOULD NOT be de-referenced.";
       union {
-        type "/aritype/object";
-        type "/aritype/namespace";
+        type ari:object;
+        type ari:namespace;
       }
     }
     amm:result match {
       description
         "True if and only if the org-id is private.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper match-org-int-range {
@@ -5787,15 +5787,15 @@ This includes the following:
          If the reference does not use integer form of org-id,
          it SHALL be dereferenced and translated to integer form.";
       union {
-        type "/aritype/object";
-        type "/aritype/namespace";
+        type ari:object;
+        type ari:namespace;
       }
     }
     amm:result match {
       description
         "True if and only if the org-id is within the
          desired inclusive range.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper is-model-odm {
@@ -5810,14 +5810,14 @@ This includes the following:
         "The reference value to check.
          This value SHOULD NOT be de-referenced.";
       union {
-        type "/aritype/object";
-        type "/aritype/namespace";
+        type ari:object;
+        type ari:namespace;
       }
     }
     amm:result match {
       description
         "True if and only if the model is an ODM.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper match-model-int-range {
@@ -5842,15 +5842,15 @@ This includes the following:
          If the reference does not use integer form of model-id,
          it SHALL be dereferenced and translated to integer form.";
       union {
-        type "/aritype/object";
-        type "/aritype/namespace";
+        type ari:object;
+        type ari:namespace;
       }
     }
     amm:result match {
       description
         "True if and only if the model-id is within the
          desired inclusive range.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper is-same-ns {
@@ -5865,7 +5865,7 @@ This includes the following:
       description
         "A reference to the desired namespace to compare with.
          If this de-reference fails the result SHALL be undefined.";
-      type "/aritype/namespace";
+      type ari:namespace;
     }
     amm:operand value {
       description
@@ -5875,15 +5875,15 @@ This includes the following:
          its namespace portion (org-id and model-id) dereferenced
          and compared with the desired namespace.";
       union {
-        type "/aritype/object";
-        type "/aritype/namespace";
+        type ari:object;
+        type ari:namespace;
       }
     }
     amm:result match {
       description
         "True if and only if the value references the same
          namespace as the desired.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper match-object-type {
@@ -5897,20 +5897,20 @@ This includes the following:
          primitive integer enumeration, or text name.
          If the desired type is unknown to the Agent the result
          SHALL be undefined.";
-      type "/aritype/aritype";
+      type ari:aritype;
     }
     amm:operand value {
       description
         "The object reference value to check.
          If the de-reference itself fails the result SHALL be
          false.";
-      type "/aritype/object";
+      type ari:object;
     }
     amm:result match {
       description
         "True if and only if the type-id matches the desired
          object type.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper match-object-int-range {
@@ -5934,13 +5934,13 @@ This includes the following:
         "The reference value to check.
          If the reference does not use integer form of obj-id,
          it SHALL be dereferenced and translated to integer form.";
-      type "/aritype/object";
+      type ari:object;
     }
     amm:result match {
       description
         "True if and only if the obj-id is within the
          desired inclusive range.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper is-same-object {
@@ -5955,19 +5955,19 @@ This includes the following:
       description
         "A reference to the desired object to compare with.
          If this de-reference fails the result SHALL be undefined.";
-      type "/aritype/object";
+      type ari:object;
     }
     amm:operand value {
       description
         "The reference value to compare with the desired object.
          If this de-reference fails the result SHALL be false.";
-      type "/aritype/object";
+      type ari:object;
     }
     amm:result match {
       description
         "True if and only if the value references the same object
          as the desired.";
-      type "/aritype/bool";
+      type ari:bool;
     }
   }
   amm:oper ref {
@@ -5981,16 +5981,16 @@ This includes the following:
       description
         "The input reference value.";
       union {
-        type "/aritype/object";
-        type "/aritype/namespace";
+        type ari:object;
+        type ari:namespace;
       }
     }
     amm:result ref {
       description
         "The output reference value.";
       union {
-        type "/aritype/object";
-        type "/aritype/namespace";
+        type ari:object;
+        type ari:namespace;
       }
     }
   }
@@ -6115,7 +6115,7 @@ This includes the following:
          and use as bind-values for the target parameter.
          This is limited to signed int length because LABEL
          values are also limited to signed int.";
-      type "/aritype/int" {
+      type ari:int {
         range "0..max";
       }
     }
@@ -6185,18 +6185,18 @@ This includes the following:
          The order of columns in the filtered result table SHALL
          correspond with the order of columns in this list.";
       amm:ulist {
-        type "/aritype/UVAST";
+        type ari:uvast;
       }
     }
     amm:operand in {
       description
         "Table to filter.";
-      type "/aritype/TBL";
+      type ari:tbl;
     }
     amm:result out {
       description
         "The filtered table.";
-      type "/aritype/TBL";
+      type ari:tbl;
     }
   }
   amm:oper tbl-get {
@@ -6206,17 +6206,17 @@ This includes the following:
     amm:parameter row {
       description
         "Index of the row (major axis) of the item.";
-      type "/aritype/uint";
+      type ari:uint;
     }
     amm:parameter column {
       description
         "Index of the column (minor axis) of the item.";
-      type "/aritype/uint";
+      type ari:uint;
     }
     amm:operand in {
       description
         "List to retrieve a value from.";
-      type "/aritype/TBL";
+      type ari:tbl;
     }
     amm:result out {
       description
@@ -6234,12 +6234,12 @@ This includes the following:
     amm:parameter index {
       description
         "Index of the value to retrieve from the list.";
-      type "/aritype/uint";
+      type ari:uint;
     }
     amm:operand in {
       description
         "List to retrieve a value from.";
-      type "/aritype/AC";
+      type ari:ac;
     }
     amm:result out {
       description
@@ -6262,7 +6262,7 @@ This includes the following:
     amm:operand in {
       description
         "Map to retrieve a value from.";
-      type "/aritype/AM";
+      type ari:am;
     }
     amm:result out {
       description
@@ -6373,7 +6373,7 @@ The ADM module in this section implements the entities described in <xref sectio
     description
       "A list of permission object (IDENT) references.";
     amm:ulist {
-      type "/aritype/ident" {
+      type ari:ident {
         amm:base "./ident/permission";
       }
     }
