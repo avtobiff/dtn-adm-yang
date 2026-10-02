@@ -11,10 +11,10 @@
 <?rfc compact="no" ?>
 <!-- do not start each main section on a new page -->
 <?rfc subcompact="no" ?>
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" consensus="true" docName="draft-ietf-dtn-adm-yang-06" ipr="trust200902" submissionType="IETF" symRefs="true" tocInclude="true" version="3" xml:lang="en">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" consensus="true" docName="draft-ietf-dtn-adm-yang-07" ipr="trust200902" submissionType="IETF" symRefs="true" tocInclude="true" version="3" xml:lang="en">
   <front>
     <title abbrev="DTNMA ADM YANG">DTNMA Application Data Model (ADM) YANG Syntax</title>
-    <seriesInfo name="Internet-Draft" value="draft-ietf-dtn-adm-yang-06"/>
+    <seriesInfo name="Internet-Draft" value="draft-ietf-dtn-adm-yang-07"/>
     <author fullname="Edward J. Birrane, III" initials="E.J." surname="Birrane">
       <organization abbrev="JHU/APL">The Johns Hopkins University Applied Physics Laboratory</organization>
       <address>
@@ -41,6 +41,12 @@
         <email>Justin.Ethier@jhuapl.edu</email>
       </address>
     </author>
+    <author fullname="Per Andersson" initials="P." surname="Andersson">
+      <organization>Ionio Systems</organization>
+      <address>
+        <email>per.ietf@ionio.se</email>
+      </address>
+    </author>
     <date/>
     <area>Transport</area>
     <workgroup>Delay-Tolerant Networking</workgroup>
@@ -50,7 +56,7 @@
     <abstract>
       <t>
 This document defines a concrete syntax for encoding a Delay-Tolerant Networking Management Architecture (DTNMA) Application Data Model (ADM) using the syntax and modular structure, but not the full data model, of YANG.
-Extensions to YANG are defined to capture the specifics needed to define DTNMA Application Management Model (AMM) objects and to use the Application Resource Identifier (ARI) data-value syntax.
+Extensions to YANG are defined to capture the specifics needed to define DTNMA Application Management Model (AMM) objects and to use the Application Resource Identifier (ARI) data-value syntax. This document defines eight ADM YANG modules.
       </t>
     </abstract>
   </front>
@@ -156,7 +162,7 @@ After explanation of extensions in <xref target="sec-yang-ext"/>, the following 
     <section anchor="sec-adm-module">
       <name>ADM Module Contents</name>
       <t>
-An ADM module is identified, as defined in <xref target="sec-yang-proc-reuse"/>, by the module "namespace" having an "ari" scheme.
+An ADM module is identified, as defined in <xref target="sec-yang-proc-reuse"/>, by the "amm:amm" YANG extension. Furthermore it is common that the module "namespace" has an "ari" scheme.
 Within an ADM module, this profile makes restrictions in <xref target="sec-yang-proc-restrict"/> which are formalized in the following table of allowed module substatements.
 This table is adapted from <xref section="7.1" target="RFC7950"/>.
       </t>
@@ -245,6 +251,13 @@ Later versions of YANG syntax could introduce incompatible changes and will need
             </td>
           </tr>
           <tr>
+            <td>amm:amm</td>
+            <td>0..1</td>
+            <td>
+                <xref target="sec-yang-ext-amm"/>
+            </td>
+          </tr>
+          <tr>
             <td>extension</td>
             <td>0..n</td>
             <td>
@@ -273,10 +286,10 @@ Later versions of YANG syntax could introduce incompatible changes and will need
             </td>
           </tr>
           <tr>
-            <td>amm:typedef</td>
+            <td>typedef</td>
             <td>0..n</td>
             <td>
-              <xref target="sec-yang-ext-typedef"/>
+              <xref section="7.3" target="RFC7950"/>
             </td>
           </tr>
           <tr>
@@ -432,7 +445,7 @@ See <xref target="sec-auth-consid"/> for author considerations about the distinc
               <th colspan="2">One of the semantic type:</th>
             </tr>
             <tr>
-              <td>amm:type</td>
+              <td>type</td>
               <td>0..1</td>
             </tr>
             <tr>
@@ -452,7 +465,7 @@ See <xref target="sec-auth-consid"/> for author considerations about the distinc
               <td>0..1</td>
             </tr>
             <tr>
-              <td>amm:union</td>
+              <td>union</td>
               <td>0..1</td>
             </tr>
             <tr>
@@ -525,7 +538,7 @@ Differently to YANG, the AMM type names are encoded in ARI syntax and compared i
 One example of naming a built-in type <tt>UINT</tt> is below.
       </t>
       <sourcecode>
-/ARITYPE/UINT
+ari:uint
 </sourcecode>
       <t>
 A TYPEDEF is a way for an ADM to apply a name and descriptive metadata to a specific semantic type (see <xref section="3.3" target="I-D.ietf-dtn-amm"/>).
@@ -533,7 +546,7 @@ The TYPEDEF is also a top-level ADM object, as explained in <xref section="3.4.2
 Because they are ADM objects, they can be referenced by ARIs when necessary as in the example below.
       </t>
       <sourcecode>
-//example/adm-a/TYPEDEF/mytype
+adm-a:mytype
 </sourcecode>
       <t>
 Except for the case of a simple "type" with no restrictions or annotations, anywhere one of the <xref target="sec-yang-ext-semtype">semantic type statements</xref> occurs in an object definition can be considered as an "anonymous" unnamed semantic type.
@@ -545,6 +558,12 @@ The behavior in those cases is identical to a TYPEDEF just without a name associ
       <t>
 In order to provide syntax necessary for AMM Object instance definitions this document defines, via the <xref target="sec-yang-ietf-amm">DTNMA ADM</xref>, the following extensions for ADM modules.
       </t>
+      <section anchor="sec-yang-ext-amm">
+        <name>The <tt>amm:amm</tt> Statement</name>
+        <t>
+An ADM YANG module is identified by having the "amm:amm" extension statement present in the module.
+        </t>
+      </section>
       <section anchor="sec-yang-ext-enum">
         <name>The <tt>amm:enum</tt> Statement</name>
         <t>
@@ -565,10 +584,13 @@ The statements within this section enable the various semantic type classes, as 
 They are all used as substatements within one of the AMM object definition statements, sometimes directly (<em>e.g.</em>, for CONST or EDD typing) and sometimes indirectly (<em>e.g.</em>, for parameter or operand typing), but always as a choice between the need for one of the semantic type statements.
         </t>
         <section anchor="sec-yang-ext-type">
-          <name>The <tt>amm:type</tt> Statement</name>
+          <name>The AMM <tt>type</tt> Statement</name>
           <t>
 This statement creates a Named Type Use semantic type (see <xref section="3.3.1" target="I-D.ietf-dtn-amm"/>) for its parent statement.
-The argument to this statement is the text form of the ARI for the type being used, which can either be a built-in <tt>ARITYPE</tt> or a <tt>TYPEDEF</tt> object reference.
+The argument to this statement is a YANG built-in type, derived type, or an ADM type extension.
+          </t>
+          <t>
+Note differences from native YANG <xref section="7.3" target="RFC7950"/>.
           </t>
           <t>
 The substatements under this are annotations or constraints on the type being used.
@@ -576,7 +598,7 @@ The <tt>units</tt>, <tt>range</tt>, <tt>length</tt>, and <tt>pattern</tt> statem
 For compatibility reasons, the arguments used for <tt>pattern</tt> statements <bcp14>SHALL</bcp14> be limited to the constructs compatible with I-Regexp of <xref target="RFC9485"/>.
           </t>
           <table>
-            <name><tt>amm:type</tt> Substatements</name>
+            <name><tt>type</tt> Substatements</name>
             <thead>
               <tr>
                 <th>Substatement</th>
@@ -637,7 +659,7 @@ For compatibility reasons, the arguments used for <tt>pattern</tt> statements <b
                 <td>For <tt>CBOR</tt> only</td>
               </tr>
               <tr>
-                <td>amm:base</td>
+                <td>base</td>
                 <td>0..*</td>
                 <td>For <tt>IDENT</tt> only</td>
               </tr>
@@ -647,17 +669,17 @@ For compatibility reasons, the arguments used for <tt>pattern</tt> statements <b
 Examples of the "type" statement are below, some as simple use and some as restriction.
           </t>
           <sourcecode type="yang">
-amm:type "/aritype/uint" {
+type ari:uint {
   description
     "unconstrained";
 }
-amm:type "/aritype/uint" {
+type ari:uint {
   description
     "constrained number";
   units "meter";
   range "3..10";
 }
-amm:type "/aritype/textstr" {
+type ari:textstr {
   description
     "constrained text size";
   length "10..100";
@@ -716,7 +738,7 @@ There are no substatements within this statement.
             </t>
           </section>
           <section anchor="sec-yang-ext-base-use">
-            <name>The <tt>amm:base</tt> Statement</name>
+            <name>The AMM <tt>base</tt> Statement</name>
             <t>
 This statement constrains an <xref target="sec-yang-ext-ident">IDENT</xref> object reference to allow only objects with a particular base themselves.
 The argument to this statement is the text form of the ARI referencing the required base object.
@@ -765,7 +787,7 @@ There is no argument to this statement.
                 <th colspan="2">One of the semantic type:</th>
               </tr>
               <tr>
-                <td>amm:type</td>
+                <td>type</td>
                 <td>0..1</td>
               </tr>
               <tr>
@@ -781,7 +803,7 @@ There is no argument to this statement.
                 <td>0..1</td>
               </tr>
               <tr>
-                <td>amm:union</td>
+                <td>union</td>
                 <td>0..1</td>
               </tr>
             </tbody>
@@ -791,10 +813,10 @@ Examples of the "amm:ulist" statement are below, some as simple use and some as 
           </t>
           <sourcecode type="yang">
 amm:ulist {
-  amm:type "/aritype/uint";
+  type ari:uint;
 }
 amm:ulist {
-  amm:type "/aritype/uint" {
+  type ari:uint {
     range "3..10";
     units "meter";
   }
@@ -833,7 +855,7 @@ Each of the type use substatements defines a single element within the AC, excep
                 <th colspan="2">One or more of the semantic type:</th>
               </tr>
               <tr>
-                <td>amm:type</td>
+                <td>type</td>
                 <td>0..n</td>
               </tr>
               <tr>
@@ -849,7 +871,7 @@ Each of the type use substatements defines a single element within the AC, excep
                 <td>0..n</td>
               </tr>
               <tr>
-                <td>amm:union</td>
+                <td>union</td>
                 <td>0..n</td>
               </tr>
               <tr>
@@ -864,15 +886,15 @@ Examples of the "amm:dlist" statement are below, one as simple structure and the
           <sourcecode type="yang">
 amm:dlist {
   // each "type" substatement is one element of the AC
-  amm:type "/aritype/uint";
-  amm:type "/aritype/uint";
+  type ari:uint;
+  type ari:uint;
 }
 amm:dlist {
   // first AC element is text
-  amm:type "/aritype/textstr";
+  type ari:textstr;
   // remaining 2-10 element are int
   amm:seq {
-    amm:type "/aritype/int";
+    type ari:int;
     min-elements 2;
     max-elements 10;
   }
@@ -941,7 +963,7 @@ Keep in mind that AM keys are always constrained to untyped literal values and t
                 <th colspan="2">One of the semantic type:</th>
               </tr>
               <tr>
-                <td>amm:type</td>
+                <td>type</td>
                 <td>0..1</td>
               </tr>
               <tr>
@@ -957,7 +979,7 @@ Keep in mind that AM keys are always constrained to untyped literal values and t
                 <td>0..1</td>
               </tr>
               <tr>
-                <td>amm:union</td>
+                <td>union</td>
                 <td>0..1</td>
               </tr>
             </tbody>
@@ -970,17 +992,17 @@ amm:umap {
   description
     "restrict only keys";
   amm:keys {
-    amm:type "/aritype/uint";
+    type ari:uint;
   }
 }
 amm:umap {
   description
     "Map uint to text values.";
   amm:keys {
-    amm:type "/aritype/uint";
+    type ari:uint;
   }
   amm:values {
-    amm:type "/aritype/textstr";
+    type ari:textstr;
   }
 }
 </sourcecode>
@@ -1039,10 +1061,10 @@ Examples of the "amm:tblt" statement are below.
           <sourcecode type="yang">
 amm:tblt {
   amm:column first {
-    amm:type "/aritype/uint";
+    type ari:uint;
   }
   amm:column second {
-    amm:type "/aritype/textstr";
+    type ari:textstr;
   }
   amm:key "first";
 }
@@ -1087,7 +1109,7 @@ If present, any "if-feature" substatement within a column indicates that an Agen
                   <th colspan="2">One of the semantic type:</th>
                 </tr>
                 <tr>
-                  <td>amm:type</td>
+                  <td>type</td>
                   <td>0..1</td>
                 </tr>
                 <tr>
@@ -1103,7 +1125,7 @@ If present, any "if-feature" substatement within a column indicates that an Agen
                   <td>0..1</td>
                 </tr>
                 <tr>
-                  <td>amm:union</td>
+                  <td>union</td>
                   <td>0..1</td>
                 </tr>
               </tbody>
@@ -1111,7 +1133,7 @@ If present, any "if-feature" substatement within a column indicates that an Agen
           </section>
         </section>
         <section anchor="sec-yang-ext-union">
-          <name>The <tt>amm:union</tt> Statement</name>
+          <name>The AMM <tt>union</tt> Statement</name>
           <t>
 This statement creates a <xref target="I-D.ietf-dtn-amm">Type Union</xref> semantic type for its parent statement.
 There is no argument to this statement.
@@ -1121,7 +1143,7 @@ Each of the substatements defines one of the possible choices of the union.
 The order of the list of choices is significant, especially when converting ARI values, because the first choice which matches or converts will be used regardless of any other choices.
           </t>
           <table>
-            <name><tt>amm:union</tt> Substatements</name>
+            <name><tt>union</tt> Substatements</name>
             <thead>
               <tr>
                 <th>Substatement</th>
@@ -1141,7 +1163,7 @@ The order of the list of choices is significant, especially when converting ARI 
                 <th colspan="2">Ordered choice of semantic types:</th>
               </tr>
               <tr>
-                <td>amm:type</td>
+                <td>type</td>
                 <td>0..n</td>
               </tr>
               <tr>
@@ -1166,18 +1188,18 @@ The order of the list of choices is significant, especially when converting ARI 
 Examples of the "union" statement are below, some as simple use and some as restriction.
           </t>
           <sourcecode type="yang">
-amm:union {
+type union {
   description
     "an optional int";
-  amm:type "/aritype/int";
-  amm:type "/aritype/null";
+  type ari:int;
+  type ari:null;
 }
-amm:union {
-  amm:type "/aritype/uint" {
+type union {
+  type ari:uint {
     range "3..10";
     units "meter";
   }
-  amm:type "/aritype/textstr";
+  type ari:textstr;
 }
 </sourcecode>
         </section>
@@ -1224,7 +1246,7 @@ The "amm:seq" is not present as a top-level value type except for the special ca
                 <th colspan="2">One of the semantic type:</th>
               </tr>
               <tr>
-                <td>amm:type</td>
+                <td>type</td>
                 <td>0..1</td>
               </tr>
               <tr>
@@ -1240,7 +1262,7 @@ The "amm:seq" is not present as a top-level value type except for the special ca
                 <td>0..1</td>
               </tr>
               <tr>
-                <td>amm:union</td>
+                <td>union</td>
                 <td>0..1</td>
               </tr>
             </tbody>
@@ -1250,9 +1272,9 @@ Examples of the "seq" statement are below.
           </t>
           <sourcecode type="yang">
 amm:dlist {
-  amm:type "/aritype/textstr";
+  type ari:textstr;
   amm:seq {
-    amm:type "/aritype/uint";
+    type ari:uint;
     min-elements 1;
   }
 }
@@ -1299,7 +1321,7 @@ When the "amm:seq" statement is used to type a formal parameter, it <bcp14>SHALL
               <th colspan="2">One of the semantic type:</th>
             </tr>
             <tr>
-              <td>amm:type</td>
+              <td>type</td>
               <td>0..1</td>
             </tr>
             <tr>
@@ -1319,7 +1341,7 @@ When the "amm:seq" statement is used to type a formal parameter, it <bcp14>SHALL
               <td>0..1</td>
             </tr>
             <tr>
-              <td>amm:union</td>
+              <td>union</td>
               <td>0..1</td>
             </tr>
             <tr>
@@ -1333,17 +1355,17 @@ An example of the "parameter" statement is below, where there are three defined 
         </t>
         <sourcecode type="yang">
   amm:parameter first {
-    amm:type "/aritype/uint" {
+    type ari:uint {
       range "3..10";
     }
   }
   amm:parameter second {
-    amm:type "/aritype/textstr";
+    type ari:textstr;
     amm:default "\"value\"";
   }
   amm:parameter third {
     amm:ulist {
-      amm:type "/aritype/uint";
+      type ari:uint;
     }
     amm:default "/AC/(3,5,8)"
   }
@@ -1360,16 +1382,16 @@ The default value is used in the Parameter Handling procedure (see <xref section
         </section>
       </section>
       <section anchor="sec-yang-ext-typedef">
-        <name>The <tt>amm:typedef</tt> Statement</name>
+        <name>The AMM <tt>typedef</tt> Statement</name>
         <t>
-This statement is used to define a Semantic Type (TYPEDEF) object (see <xref section="3.4.2" target="I-D.ietf-dtn-amm"/>).
+This statement is used to define derived type or a Semantic Type (TYPEDEF) object (see <xref section="3.4.2" target="I-D.ietf-dtn-amm"/>).
 The argument to this statement is the name of the object instance.
         </t>
         <t>
 The substatements under this are a choice of a top-level semantic type (see <xref target="sec-yang-ext-semtype"/>) being named by the typedef.
         </t>
         <table>
-          <name><tt>amm:typedef</tt> Substatements</name>
+          <name><tt>typedef</tt> Substatements</name>
           <thead>
             <tr>
               <th>Substatement</th>
@@ -1405,7 +1427,7 @@ The substatements under this are a choice of a top-level semantic type (see <xre
               <th colspan="2">One of the semantic type:</th>
             </tr>
             <tr>
-              <td>amm:type</td>
+              <td>type</td>
               <td>0..1</td>
             </tr>
             <tr>
@@ -1425,7 +1447,7 @@ The substatements under this are a choice of a top-level semantic type (see <xre
               <td>0..1</td>
             </tr>
             <tr>
-              <td>amm:union</td>
+              <td>union</td>
               <td>0..1</td>
             </tr>
           </tbody>
@@ -1434,25 +1456,25 @@ The substatements under this are a choice of a top-level semantic type (see <xre
 Examples of the "typedef" statement are below, some as restriction and some as union.
         </t>
         <sourcecode type="yang">
-  amm:typedef restricted-uint {
+  typedef restricted-uint {
     description
       "Example restriction";
-    amm:type "/aritype/uint" {
+    type ari:uint {
       range "3..10";
     }
   }
-  amm:typedef annotated-uint {
+  typedef annotated-uint {
     description
       "Example units annotation";
-    amm:type "/aritype/uint" {
+    type ari:uint {
       units "meter";
     }
   }
-  amm:typedef structured-ac {
+  typedef structured-ac {
     description
       "Example units on AC items";
     amm:ulist {
-      amm:type "/aritype/real32";
+      type ari:real32;
       amm:units "meter";
       min-elements 3;
       max-elements 10;
@@ -1461,16 +1483,19 @@ Examples of the "typedef" statement are below, some as restriction and some as u
 </sourcecode>
       </section>
       <section anchor="sec-yang-ext-ident">
-        <name>The <tt>amm:ident</tt> Statement</name>
+        <name>The AMM <tt>identity</tt> Statement</name>
         <t>
 This statement is used to define an Identity (IDENT) object (see <xref section="3.4.3" target="I-D.ietf-dtn-amm"/>).
 The argument to this statement is the name of the object instance.
         </t>
+          <t>
+Note differences from native YANG <xref section="7.18" target="RFC7950"/>.
+          </t>
         <t>
 The substatements under this are the common object metadata, optional formal parameters, and any number of base IDENT objects from which this one is derived.
         </t>
         <table>
-          <name><tt>amm:ident</tt> Substatements</name>
+          <name>AMM <tt>identity</tt> Substatements</name>
           <thead>
             <tr>
               <th>Substatement</th>
@@ -1507,7 +1532,7 @@ The substatements under this are the common object metadata, optional formal par
               <td>0..1</td>
             </tr>
             <tr>
-              <td>amm:base</td>
+              <td>base</td>
               <td>0..*</td>
             </tr>
             <tr>
@@ -1520,31 +1545,31 @@ The substatements under this are the common object metadata, optional formal par
 An example of a multiple-base hierarchy of IDENT objects is below.
         </t>
         <sourcecode type="yang">
-  amm:ident base-a {
+  identity base-a {
     amm:abstract true;
     description
       "A base identity object.";
   }
-  amm:ident base-b {
+  identity base-b {
     amm:abstract true;
     description
       "Another base identity object.";
   }
-  amm:ident use-1 {
-    amm:base "./IDENT/base-a";
+  identity use-1 {
+    base base-a;
     description
       "An identity derived from base-a.";
   }
-  amm:ident use-2 {
-    amm:base "./IDENT/use-1";
-    amm:base "./IDENT/base-b";
+  identity use-2 {
+    base use-1;
+    base base-b;
     description
       "An identity derived from base-a (via use-1) and base-b.";
   }
-  amm:ident use-3 {
-    amm:base "./IDENT/base-b";
+  identity use-3 {
+    base base-b;
     amm:parameter option {
-      amm:type "/aritype/int";
+      type ari:int;
     }
     description
       "An identity derived from base-b which includes a parameter.";
@@ -1562,7 +1587,7 @@ There are no substatements within this statement.
           </t>
         </section>
         <section anchor="sec-yang-ext-base">
-          <name>The <tt>amm:base</tt> Statement</name>
+          <name>The AMM <tt>base</tt> Statement</name>
           <t>
 This statement causes the parent <xref target="sec-yang-ext-ident">IDENT</xref> object to be derived from a referenced base object.
 The argument to this statement is the text form of the ARI referencing the required base object.
@@ -1634,7 +1659,7 @@ The <tt>amm:const</tt> statement <bcp14>SHALL</bcp14> contain a an <tt>amm:init-
               <th colspan="2">One of the semantic type:</th>
             </tr>
             <tr>
-              <td>amm:type</td>
+              <td>type</td>
               <td>0..1</td>
             </tr>
             <tr>
@@ -1654,7 +1679,7 @@ The <tt>amm:const</tt> statement <bcp14>SHALL</bcp14> contain a an <tt>amm:init-
               <td>0..1</td>
             </tr>
             <tr>
-              <td>amm:union</td>
+              <td>union</td>
               <td>0..1</td>
             </tr>
           </tbody>
@@ -1664,7 +1689,7 @@ An example of a simple-typed CONST is below.
         </t>
         <sourcecode type="yang">
   amm:const pi32 {
-    amm:type "/aritype/real32";
+    type ari:real32;
     amm:init-value "3.14159";
     description
       "A truncated value of Pi.";
@@ -1675,7 +1700,7 @@ Another example of a semantic-typed MAC-valued CONST (see <xref section="4.2.4" 
         </t>
         <sourcecode type="yang">
   amm:const do_thing {
-    amm:type "//ietf-amm/typedef/mac";
+    type amm:mac;
     amm:init-value "/AC/(../CTRL/first,../CTRL/second(2))";
     description
       "Execute two controls in sequence.";
@@ -1743,12 +1768,12 @@ An example of a single-parameter CTRL is below.
         <sourcecode type="yang">
   amm:ctrl reset_count {
     amm:parameter src {
-      type textstr;
+      type ari:textstr;
       description
         "The name of the source.";
     }
     amm:result previous {
-      type UVAST;
+      type ari:uvast;
       description
         "The value just before reset.";
     }
@@ -1787,7 +1812,7 @@ The argument to this statement is an identifier for the result.
                 <th colspan="2">One of the semantic type:</th>
               </tr>
               <tr>
-                <td>amm:type</td>
+                <td>type</td>
                 <td>0..1</td>
               </tr>
               <tr>
@@ -1807,7 +1832,7 @@ The argument to this statement is an identifier for the result.
                 <td>0..1</td>
               </tr>
               <tr>
-                <td>amm:union</td>
+                <td>union</td>
                 <td>0..1</td>
               </tr>
             </tbody>
@@ -1864,7 +1889,7 @@ The substatements under this are the common object metadata, optional formal par
               <th colspan="2">One of the semantic type:</th>
             </tr>
             <tr>
-              <td>amm:type</td>
+              <td>type</td>
               <td>0..1</td>
             </tr>
             <tr>
@@ -1884,7 +1909,7 @@ The substatements under this are the common object metadata, optional formal par
               <td>0..1</td>
             </tr>
             <tr>
-              <td>amm:union</td>
+              <td>union</td>
               <td>0..1</td>
             </tr>
           </tbody>
@@ -1894,7 +1919,7 @@ An example of a simple-typed EDD is below.
         </t>
         <sourcecode type="yang">
   amm:edd tx_count {
-    amm:type "//ietf-amm/typedef/counter64" {
+    type amm:counter64 {
       units "frames";
     }
     description
@@ -1964,13 +1989,13 @@ An example of an arithmetic OPER is below.
         <sourcecode type="yang">
   amm:oper add {
     amm:operand val-a {
-      amm:type "//ietf-amm/typedef/numeric";
+      type amm:numeric;
     }
     amm:operand val-b {
-      amm:type "//ietf-amm/typedef/numeric";
+      type amm:numeric;
     }
     amm:result sum {
-      amm:type "//ietf-amm/typedef/numeric";
+      type amm:numeric;
     }
     description
       "Sum together the two operands.";
@@ -1984,10 +2009,10 @@ Also note the anonymous semantic type used to restrict the parameter.
   amm:oper sum {
     description
       "Sum together a sequence from the stack.";
-    parameter count {
+    amm:parameter count {
       description
         "The number of operands to pop."
-      amm:type "/aritype/uint" {
+      type ari:uint {
         range "1..max";
       }
     }
@@ -1995,10 +2020,10 @@ Also note the anonymous semantic type used to restrict the parameter.
       description
         "This is not within a container, so does not represent an AC;
         it is multiple operands.";
-      amm:type "//ietf-amm/typedef/numeric";
+      type amm:numeric;
     }
     result sum {
-      amm:type "//ietf-amm/typedef/numeric";
+      type amm:numeric;
     }
   }
 </sourcecode>
@@ -2034,7 +2059,7 @@ All operands <bcp14>SHALL</bcp14> have unique names within the same parent objec
                 <th colspan="2">One of the semantic type:</th>
               </tr>
               <tr>
-                <td>amm:type</td>
+                <td>type</td>
                 <td>0..1</td>
               </tr>
               <tr>
@@ -2054,7 +2079,7 @@ All operands <bcp14>SHALL</bcp14> have unique names within the same parent objec
                 <td>0..1</td>
               </tr>
               <tr>
-                <td>amm:union</td>
+                <td>union</td>
                 <td>0..1</td>
               </tr>
             </tbody>
@@ -2292,7 +2317,7 @@ The substatements under this are the common object metadata, optional formal par
               <th colspan="2">One of the semantic type:</th>
             </tr>
             <tr>
-              <td>amm:type</td>
+              <td>type</td>
               <td>0..1</td>
             </tr>
             <tr>
@@ -2312,7 +2337,7 @@ The substatements under this are the common object metadata, optional formal par
               <td>0..1</td>
             </tr>
             <tr>
-              <td>amm:union</td>
+              <td>union</td>
               <td>0..1</td>
             </tr>
           </tbody>
@@ -2324,7 +2349,7 @@ An example of a simple-typed VAR with an initializer value is below.
   amm:var min_threshold {
     description
       "The lower threshold to enable safe mode.";
-    amm:type "/aritype/real32" {
+    type ari:real32 {
       units "meter";
     }
     amm:init-value "1e4";
@@ -2455,6 +2480,58 @@ All of the ADMs in this registry are under the "iana" organization (enumeration 
           </tbody>
         </table>
       </section>
+      <section title='The "YANG Module Names" Registry'>
+        <t>
+This document registers eight YANG modules in the YANG Module Names Registry
+<xref target="RFC6020"/> maintained at
+<eref target="https://www.iana.org/assignments/yang-parameters/yang-parameters.xhtml"/>.
+Following the format defined in <xref target="RFC6020"/>, the below registration
+is requested:
+        </t>
+          <figure align="center">
+            <artwork>
+name: ietf-amm
+namespace: ari://ietf/amm/
+prefix: amm
+RFC: [This document]
+
+name: ietf-ari-types
+namespace: ari://ietf/ari-types/
+prefix: ari
+RFC: [This document]
+
+name: ietf-amm-semtype
+namespace: ari://ietf/amm-semtype/
+prefix: amm-semtype
+RFC: [This document]
+
+name: ietf-amm-base
+namespace: ari://ietf/amm-base/
+prefix: amm-type <!-- TODO: either amm-base or change module name and ns -->
+RFC: [This document]
+
+name: ietf-network-base
+namespace: ari://ietf/network-base/
+prefix: network-base <!-- TODO: amm-network-base -->
+RFC: [This document]
+
+name: ietf-dtnma-agent
+namespace: ari://ietf/dtnma-agent
+prefix: da <!-- TODO: amm-da -->
+RFC: [This document]
+
+name: ietf-dtnma-agent-acl
+namespace: ari://ietf/dtnma-agent-acl
+prefix: acl <!-- TODO: amm-acl -->
+RFC: [This document]
+
+name: iana-display-hints <!-- TODO iana-amm-display-hints -->
+namespace: ari://iana/display-hints
+prefix: ianadh <!-- TODO: iana-ammdh -->
+RFC: [This document]
+            </artwork>
+          </figure>
+      </section>
     </section>
     <section anchor="Security" title="Security Considerations">
       <t>
@@ -2515,7 +2592,7 @@ It does not address what the contents of those ADMs are or any security consider
           <seriesInfo name="RFC" value="9485"/>
           <seriesInfo name="DOI" value="10.17487/RFC9485"/>
         </reference>
-        <reference anchor="I-D.ietf-dtn-amm" target="https://datatracker.ietf.org/doc/html/draft-ietf-dtn-amm-00" xml:base="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-dtn-amm.xml">
+        <reference anchor="I-D.ietf-dtn-amm" target="https://datatracker.ietf.org/doc/html/draft-ietf-dtn-amm-06" xml:base="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-dtn-amm.xml">
           <front>
             <title>DTNMA Application Management Model (AMM) and Data Models</title>
             <author fullname="Edward J. Birrane" initials="E. J." surname="Birrane">
@@ -2527,14 +2604,14 @@ It does not address what the contents of those ADMs are or any security consider
             <author fullname="Justin Ethier" initials="J." surname="Ethier">
               <organization>The Johns Hopkins University Applied Physics Laboratory</organization>
             </author>
-            <date day="3" month="July" year="2024"/>
+            <date day="16" month="January" year="2026"/>
             <abstract>
-              <t>This document defines a data model that captures the information necessary to asynchronously manage applications within the Delay- Tolerant Networking Management Architecture (DTNMA). This model provides a set of common type definitions, data structures, and a template for publishing standardized representations of model elements.</t>
+              <t>This document defines a model that captures the information necessary to asynchronously manage applications within the Delay-Tolerant Networking Management Architecture (DTNMA). This model provides a set of common managed object types, data types and structures, and a template for information needed within each application data model. The built-in definitions are made to be extensible by applications without needing to modify core Agent or Manager behavior.</t>
             </abstract>
           </front>
-          <seriesInfo name="Internet-Draft" value="draft-ietf-dtn-amm-00"/>
+          <seriesInfo name="Internet-Draft" value="draft-ietf-dtn-amm-06"/>
         </reference>
-        <reference anchor="I-D.ietf-dtn-ari" target="https://datatracker.ietf.org/doc/html/draft-ietf-dtn-ari-00" xml:base="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-dtn-ari.xml">
+        <reference anchor="I-D.ietf-dtn-ari" target="https://datatracker.ietf.org/doc/html/draft-ietf-dtn-ari-08" xml:base="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-dtn-ari.xml">
           <front>
             <title>DTNMA Application Resource Identifier (ARI)</title>
             <author fullname="Edward J. Birrane" initials="E. J." surname="Birrane">
@@ -2546,12 +2623,12 @@ It does not address what the contents of those ADMs are or any security consider
             <author fullname="Brian Sipos" initials="B." surname="Sipos">
               <organization>The Johns Hopkins University Applied Physics Laboratory</organization>
             </author>
-            <date day="22" month="February" year="2024"/>
+            <date day="16" month="January" year="2026"/>
             <abstract>
               <t>This document defines the structure, format, and features of the naming scheme for the objects defined in the Delay-Tolerant Networking Management Architecture (DTNMA) Application Management Model (AMM), in support of challenged network management solutions described in the DTNMA document. This document defines the DTNMA Application Resource Identifier (ARI), using a text-form based on the common Uniform Resource Identifier (URI) and a binary-form based on Concise Binary Object Representation (CBOR). These meet the needs for a concise, typed, parameterized, and hierarchically organized set of managed data elements.</t>
             </abstract>
           </front>
-          <seriesInfo name="Internet-Draft" value="draft-ietf-dtn-ari-00"/>
+          <seriesInfo name="Internet-Draft" value="draft-ietf-dtn-ari-08"/>
         </reference>
       </references>
       <references>
@@ -2607,6 +2684,7 @@ It does not address what the contents of those ADMs are or any security consider
           <seriesInfo name="RFC" value="5280"/>
           <seriesInfo name="DOI" value="10.17487/RFC5280"/>
         </reference>
+        <?rfc include="reference.RFC.6020.xml"?> <!-- YANG 1 -->
         <reference anchor="RFC7942" target="https://www.rfc-editor.org/info/rfc7942" xml:base="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7942.xml">
           <front>
             <title>Improving Awareness of Running Code: The Implementation Status Section</title>
@@ -2648,7 +2726,6 @@ It does not address what the contents of those ADMs are or any security consider
               <t>This memo provides guidelines for authors and reviewers of specifications containing YANG modules. Recommendations and procedures are defined, which are intended to increase interoperability and usability of Network Configuration Protocol (NETCONF) and RESTCONF protocol implementations that utilize YANG modules. This document obsoletes RFC 6087.</t>
             </abstract>
           </front>
-          <seriesInfo name="BCP" value="216"/>
           <seriesInfo name="RFC" value="8407"/>
           <seriesInfo name="DOI" value="10.17487/RFC8407"/>
         </reference>
@@ -2693,6 +2770,15 @@ It does not address what the contents of those ADMs are or any security consider
         <reference anchor="github-dtnma-adms" target="https://github.com/JHUAPL-DTNMA/dtnma-adms">
           <front>
             <title>Application Data Models (ADMs)</title>
+            <author>
+              <organization abbrev="JHU/APL">The Johns Hopkins University Applied Physics Laboratory</organization>
+            </author>
+            <date/>
+          </front>
+        </reference>
+        <reference anchor="github-dtnma-tools" target="https://github.com/JHUAPL-DTNMA/dtnma-tools">
+          <front>
+            <title>A reference implementation of the DTN Management Architecture (DTNMA) Agent and related Tools</title>
             <author>
               <organization abbrev="JHU/APL">The Johns Hopkins University Applied Physics Laboratory</organization>
             </author>
@@ -3042,9 +3128,351 @@ This includes the following:
        by spaces, within a 'tblt' definition.";
   }
 
-  extension union {
+  extension type union {
     description
       "Semantic type for a union of other types in substatements.";
+  }
+
+  amm:enum 0;
+}
+</sourcecode>
+    </section>
+    <section anchor="sec-yang-ietf-ari-types">
+      <name>ADM Module for AMM Built-in Types</name>
+      <t>
+The ADM module in this section implements the entities described in <xref section="3.2.1" target="I-D.ietf-dtn-amm"/>.
+      </t>
+      <sourcecode markers="true" name="ietf-ari-types.yang" type="yang" originalSrc="modules/ietf-ari-types.yang">module ietf-ari-types {
+  yang-version 1.1;
+  namespace "ari://ietf/ari-types/";
+  prefix ari-types;
+
+  import ietf-amm {
+    prefix amm;
+    reference
+      "draft-ietf-dtn-amm";
+  }
+
+  organization
+    "Internet Engineering Task Force (IETF)" {
+    amm:enum 1;
+  }
+  contact
+    "WG Web: &lt;http://tools.ietf.org/wg/dtn/&gt;
+     WG List: &lt;mailto:dtn@ietf.org&gt;
+
+     Editor: Per Andersson
+             &lt;mailto:per@ionio.se&gt;";
+  description
+    "This module defines the DTN Management Architecture (DTNMA)
+     Application Resource Identifier (ARI) types within YANG.
+
+     The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
+     NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'NOT RECOMMENDED',
+     'MAY', and 'OPTIONAL' in this document are to be interpreted as
+     described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
+     they appear in all capitals, as shown here.
+
+     Copyright (c) 2025 IETF Trust and the persons identified as
+     authors of the code.  All rights reserved.
+
+     Redistribution and use in source and binary forms, with or
+     without modification, is permitted pursuant to, and subject to
+     the license terms contained in, the Revised BSD License set
+     forth in Section 4.c of the IETF Trust's Legal Provisions
+     Relating to IETF Documents
+     (https://trustee.ietf.org/license-info).
+
+     This version of this YANG module is part of RFC XXXX
+     (https://www.rfc-editor.org/info/rfcXXXX); see the RFC itself
+     for full legal notices.";
+  reference
+    "draft-ietf-dtn-adm-yang";
+
+  revision 2025-07-03 {
+    description
+      "Updated for latest ADM document.";
+    reference
+      "draft-ietf-dtn-adm-yang";
+  }
+
+  amm:amm;
+
+  /* Typedefs */
+
+  /* DTNMA ARI Literal Types */
+
+  identity undefined {
+    description
+      "undefined";
+  }
+
+  typedef undefined {
+    type identityref {
+      base undefined;
+    }
+    default undefined;
+    description
+      "undefined";
+  }
+
+  typedef null {
+    amm:enum 0;
+    type empty;
+    description
+      "NULL";
+  }
+
+  typedef bool {
+    amm:enum 1;
+    type boolean;
+    description
+      "BOOL";
+  }
+
+  typedef byte {
+    amm:enum 2;
+    type uint8;
+    description
+      "BYTE";
+  }
+
+  typedef int {
+    amm:enum 4;
+    type int32;
+    description
+      "INT";
+  }
+
+  typedef uint {
+    amm:enum 5;
+    type uint32;
+    description
+      "UINT";
+  }
+
+  typedef vast {
+    amm:enum 6;
+    type int64;
+    description
+      "VAST";
+  }
+
+  typedef uvast {
+    amm:enum 7;
+    type uint64;
+    description
+      "UVAST";
+  }
+
+  extension real32 {
+    amm:enum 8;
+    description
+      "A 32-bit IEEE 754-2019 floating point number.";
+  }
+
+  extension real64 {
+    amm:enum 9;
+    description
+      "A 64-bit IEEE 754-2019 floating point number.";
+  }
+
+  typedef textstr {
+    amm:enum 10;
+    type string;
+    description
+      "TEXTSTR";
+  }
+
+  typedef bytestr {
+    amm:enum 11;
+    type binary;
+    description
+      "BYTESTR";
+  }
+
+  typedef lit-label {
+    type type union {
+      type int32;
+      type textstr {
+        pattern "!?[A-Za-z_][A-Za-z0-9_\\-\\.]*";
+      }
+    }
+    description
+      "lit-label";
+  }
+
+  typedef time-fraction {
+    type decimal64 {
+      fraction-digits 0;
+    }
+    description
+      "time-fraction";
+  }
+
+  typedef lit-time {
+    type type union {
+      type int32;
+      type time-fraction;
+    }
+    description
+      "lit-time";
+  }
+
+  typedef tp {
+    amm:enum 12;
+    type lit-time;
+    description
+      "TP";
+  }
+
+  typedef td {
+    amm:enum 13;
+    type lit-time;
+    description
+      "TD";
+  }
+
+  typedef label {
+    amm:enum 14;
+    type lit-label;
+    description
+      "LABEL";
+  }
+
+  typedef cbor {
+    amm:enum 15;
+    type binary;
+    description
+      "AMM CBOR
+
+       Arbitrary CBOR data.
+
+       As defined in RFC 8949.
+       No constraints from RFC 9254.";
+  }
+
+  typedef aritype {
+    amm:enum 16;
+    type lit-label;
+    description
+      "ARITYPE";
+  }
+
+  extension ac {
+    amm:enum 17;
+    argument name;
+    description
+      "An ARI COLLECTION (AC).
+
+       Substatements 'type' and 'values'.
+
+       The 'type' substatement contains the type information
+       for the collection.
+
+       The 'values' substatement, is a bracketed list syntax for inital
+       values for the collection.
+
+       Example:
+
+         ari:ac my-aris {
+           type type union {
+             type ari:uint;
+             type ari:textstr;
+           }
+           values [1,1,2,'three'];
+         }
+      ";
+  }
+
+  typedef collection {
+    type ac;
+    description
+      "Syntactic sugar for ari:ac.";
+  }
+
+  extension am {
+    amm:enum 18;
+    argument name;
+    description
+      "An ARI MAP (AM).
+
+       Substatements 'am-key' and 'am-value' which can hold the
+       following substatements 'type', 'description', 'reference', and
+       'amm:enum'.
+
+       The 'am-key' is the key associated with a value.
+
+       The 'am-value' is the associated value for a specific 'am-key'.
+
+
+       Example:
+
+         ari:am my-map {
+           am-key {
+             type ari:textstr;
+           }
+           am-value {
+             type type union {
+               type ari:uint;
+               type ari:textstr;
+             }
+           }
+         }
+      ";
+  }
+
+  /* Object types */
+
+  typedef literal-ari {
+    type string {
+      pattern "^ari:.*";
+    }
+  }
+
+  extension const {
+    description
+      "The type for using a CONST as a value's type within an ADM.";
+  }
+
+  extension ctrl {
+    description
+      "The type for using a CTRL as a value's type within an ADM.";
+  }
+
+  extension edd {
+    description
+      "The type for using a EDD as a value's type within an ADM.";
+  }
+
+  extension oper {
+    description
+      "The type for using a OPER as a value's type within an ADM.";
+  }
+
+  extension sbr {
+    description
+      "The type for using a SBR as a value's type within an ADM.";
+  }
+
+  extension tbr {
+    description
+      "The type for using a TBR as a value's type within an ADM.";
+  }
+
+  extension var {
+    description
+      "The type for using a VAR as a value's type within an ADM.";
+  }
+
+  extension namespace {
+    description
+      "The type for using a NAMESPACE as a value's type within an ADM.";
+  }
+
+  extension object {
+    description
+      "The type for using a OBJECT as a value's type within an ADM.";
   }
 
   amm:enum 0;
@@ -3102,7 +3530,7 @@ This includes an IDENT object hierarchy which allows introspection of semantic t
   reference
     "draft-ietf-dtn-adm-yang";
 
-  revision 2025-07-03 {
+  revision 2026-05-01 {
     description
       "Updated for latest ADM document.";
     reference
@@ -3111,93 +3539,94 @@ This includes an IDENT object hierarchy which allows introspection of semantic t
   amm:enum 24;
 
   // Base IDENT objects
-  amm:ident semtype {
+  identity semtype {
     amm:enum 1;
     description
       "The base IDENT for semantic type introspection.
        This object itself provides no type information.";
+    amm:abstract true;
   }
 
   // Semantic-type leaf IDENT objects
-  amm:ident type-use {
+  identity type-use {
     amm:enum 2;
     description
-      "A named type use with possibe annotations and/or
+      "A named type use with possible annotations and/or
        constraints.";
-    amm:base "./IDENT/semtype";
+    base semtype;
     amm:parameter name {
       description
         "A built-in ARITYPE or reference to TYPEDEF object being
          used.";
-      amm:type "//ietf/amm-base/TYPEDEF/type-ref";
+      type amm-type:typedef;
     }
     // FIXME include constraints and annotations also?
   }
-  amm:ident ulist {
+  identity ulist {
     amm:enum 3;
     description
       "A uniformly-typed list within an AC.";
-    amm:base "./IDENT/semtype";
+    base semtype;
     amm:parameter item-type {
       description
         "The semantic type for all items.";
-      amm:type "./TYPEDEF/semtype";
+      type semtype;
     }
     amm:parameter min-elements {
       description
         "The smallest valid item count for the AC.";
       amm:default "null";
-      amm:union {
-        amm:type "/ARITYPE/uvast";
-        amm:type "/ARITYPE/null";
+      type union {
+        type ari:uvast;
+        type ari:null;
       }
     }
     amm:parameter max-elements {
       description
         "The largest valid item count for the AC.";
       amm:default "null";
-      amm:union {
-        amm:type "/ARITYPE/uvast";
-        amm:type "/ARITYPE/null";
+      type union {
+        type ari:uvast;
+        type ari:null;
       }
     }
   }
-  amm:ident dlist {
+  identity dlist {
     amm:enum 4;
     description
       "A diverse-typed list within an AC.";
-    amm:base "./IDENT/semtype";
+    base semtype;
     amm:parameter item-types {
       description
         "The list of semantic type for each item in sequence within
          the list.
          The list itself is encoded as an AC in this parameter.";
       amm:ulist {
-        amm:type "./TYPEDEF/semtype";
+        type semtype;
       }
     }
   }
-  amm:ident umap {
+  identity umap {
     amm:enum 5;
     description
       "A uniformly-typed map within an AM.";
-    amm:base "./IDENT/semtype";
+    base semtype;
     amm:parameter key-type {
       description
         "The semantic type for each key.";
-      amm:type "./TYPEDEF/semtype";
+      type semtype;
     }
     amm:parameter value-type {
       description
         "The semantic type for each value.";
-      amm:type "./TYPEDEF/semtype";
+      type semtype;
     }
   }
-  amm:ident tblt {
+  identity tblt {
     amm:enum 6;
     description
       "A parameterized table template for data within a TBL.";
-    amm:base "./IDENT/semtype";
+    base semtype;
     amm:parameter columns {
       description
         "The list of column definitions as rows in a table.
@@ -3210,12 +3639,12 @@ This includes an IDENT object hierarchy which allows introspection of semantic t
             "The name of this column.
              Each name SHALL be unique within a table template.
              Each name SHALL be restricted to valid label text.";
-          amm:type "//ietf/amm-base/typedef/id-text";
+          type amm-type:typedef;
         }
         amm:column datatype {
           description
             "The semantic type for values in this column.";
-          amm:type "./TYPEDEF/semtype";
+          type semtype;
         }
       }
     }
@@ -3223,18 +3652,18 @@ This includes an IDENT object hierarchy which allows introspection of semantic t
       description
         "The smallest valid row count for the TBL.";
       amm:default "null";
-      amm:union {
-        amm:type "/ARITYPE/uvast";
-        amm:type "/ARITYPE/null";
+      type union {
+        type ari:uvast;
+        type ari:null;
       }
     }
     amm:parameter max-elements {
       description
         "The largest valid row count for the TBL.";
       amm:default "null";
-      amm:union {
-        amm:type "/ARITYPE/uvast";
-        amm:type "/ARITYPE/null";
+      type union {
+        type ari:uvast;
+        type ari:null;
       }
     }
     amm:parameter key {
@@ -3242,9 +3671,9 @@ This includes an IDENT object hierarchy which allows introspection of semantic t
         "The primary key column names tuples in this table,
          space-separated labels.";
       amm:default "null";
-      amm:union {
-        amm:type "/ARITYPE/textstr";
-        amm:type "/ARITYPE/null";
+      type union {
+        type ari:textstr;
+        type ari:null;
       }
     }
     amm:parameter unique {
@@ -3254,65 +3683,65 @@ This includes an IDENT object hierarchy which allows introspection of semantic t
          The set itself is encoded as an AC in this parameter.";
       amm:default "/AC/()";
       amm:ulist {
-        amm:type "/ARITYPE/textstr";
+        type ari:textstr;
       }
     }
   }
-  amm:ident union {
+  identity type union {
     amm:enum 8;
     description
       "A list of alternative type choices.";
-    amm:base "./IDENT/semtype";
+    base semtype;
     amm:parameter choices {
       description
         "The semantic type for each choice.
          The list itself is encoded as an AC in this parameter.";
       amm:ulist {
-        amm:type "./TYPEDEF/semtype";
+        type semtype;
       }
     }
   }
-  amm:ident seq {
+  identity seq {
     amm:enum 9;
     description
       "A sequence of similarly-typed items as a sub-sequence of an
        AC value.
        This is only usable in specific contexts, such as within a
-       ./IDENT/dlist parameter.";
-    amm:base "./IDENT/semtype";
+       dlist parameter.";
+    base semtype;
     amm:parameter item-type {
       description
         "The semantic type for all items in the sequence.";
-      amm:type "./TYPEDEF/semtype";
+      type semtype;
     }
     amm:parameter min-elements {
       description
         "The smallest valid item count for the sequence.";
       amm:default "null";
-      amm:union {
-        amm:type "/ARITYPE/uvast";
-        amm:type "/ARITYPE/null";
+      type union {
+        type ari:uvast;
+        type ari:null;
       }
     }
     amm:parameter max-elements {
       description
         "The largest valid item count for the sequence.";
       amm:default "null";
-      amm:union {
-        amm:type "/ARITYPE/uvast";
-        amm:type "/ARITYPE/null";
+      type union {
+        type ari:uvast;
+        type ari:null;
       }
     }
   }
 
   // Named types
-  amm:typedef semtype {
+  typedef semtype {
     amm:enum 25;
     description
       "A parameterized reference to a semantic type object.
        This is used for introspection of AMM objects.";
-    amm:type "/ARITYPE/ident" {
-      amm:base "./IDENT/semtype";
+    type ari:ident {
+      base semtype;
     }
   }
 }
@@ -3374,7 +3803,7 @@ This includes the following:
   reference
     "draft-ietf-dtn-adm-yang";
 
-  revision 2025-07-03 {
+  revision 2026-05-01 {
     description
       "Updated for latest ADM document.";
     reference
@@ -3383,7 +3812,7 @@ This includes the following:
   amm:enum 25;
 
   // abstract display hint hierarchy
-  amm:ident display-hint {
+  identity display-hint {
     amm:enum 0;
     description
       "The base IDENT for objects usable as arguments for the
@@ -3391,16 +3820,16 @@ This includes the following:
        This object itself provides no display hint purpose.";
     amm:abstract true;
   }
-  amm:ident display-hint-integer {
+  identity display-hint-integer {
     amm:enum 1;
     description
       "Intermediate base IDENT of display hints for integer values.
        Hints derived from this object SHALL only apply to built-in
        types BYTE, INT, UINT, VAST, and UVAST.";
     amm:abstract true;
-    amm:base "./IDENT/display-hint";
+    base display-hint;
   }
-  amm:ident display-hint-float {
+  identity display-hint-float {
     amm:enum 2;
     description
       "Intermediate base IDENT of display hints for floating point
@@ -3408,9 +3837,9 @@ This includes the following:
        Hints derived from this object SHALL only apply to built-in
        types REAL32 and REAL64.";
     amm:abstract true;
-    amm:base "./IDENT/display-hint";
+    base display-hint;
   }
-  amm:ident display-hint-bstr {
+  identity display-hint-bstr {
     amm:enum 3;
     description
       "Intermediate base IDENT of display hints for byte string
@@ -3418,144 +3847,158 @@ This includes the following:
        Hints derived from this object SHALL only apply to built-in
        type BYTESTR.";
     amm:abstract true;
-    amm:base "./IDENT/display-hint";
+    base display-hint;
   }
-  amm:ident display-hint-time {
+  identity display-hint-time {
     amm:enum 4;
     description
       "Intermediate base IDENT of display hints for time values.
        Hints derived from this object SHALL only apply to built-in
        types TP and TD.";
     amm:abstract true;
-    amm:base "./IDENT/display-hint";
+    base display-hint;
   }
 
   // Named type unions
-  amm:typedef type-ref {
+  typedef type-ref {
     amm:enum 0;
     description
       "Reference to either a built-in type or a TYPEDEF object.";
-    amm:union {
-      amm:type "/ARITYPE/aritype";
-      amm:type "/ARITYPE/typedef";
+    type union {
+      type ari:aritype;
+      type ari:typedef;
     }
   }
-  amm:typedef integer {
+  typedef integer {
     amm:enum 1;
     description
-      "Any type which represents a discrete integer
+      "Any type which represents a discrete integer.
        This union order prefers smaller range and signed types.";
-    amm:union {
-      amm:type "/ARITYPE/byte";
-      amm:type "/ARITYPE/int";
-      amm:type "/ARITYPE/uint";
-      amm:type "/ARITYPE/vast";
-      amm:type "/ARITYPE/uvast";
+    type union {
+      type ari:byte;
+      type ari:int;
+      type ari:uint;
+      type ari:vast;
+      type ari:uvast;
     }
   }
-  amm:typedef float {
+  typedef float {
     amm:enum 2;
     description
-      "Any type which represents a floating point number.";
-    amm:union {
-      amm:type "/ARITYPE/real32";
-      amm:type "/ARITYPE/real64";
+      "Any type which represents a floating point number.
+       This union order prefers smaller range.";
+    type union {
+      type ari:real32;
+      type ari:real64;
     }
   }
-  amm:typedef numeric {
+  typedef numeric {
     amm:enum 3;
     description
       "Any type which can be used with numeric expressions.";
-    amm:union {
-      amm:type "./TYPEDEF/integer";
-      amm:type "./TYPEDEF/float";
+    type union {
+      type integer;
+      type float;
     }
   }
-  amm:typedef primitive {
+  typedef numeric-or-time {
+    amm:enum 27;
+    description
+      "Any type which can be used with numeric or time-as-numeric
+       expressions.";
+    type union {
+      type numeric;
+      type time;
+    }
+  }
+  typedef primitive {
     amm:enum 4;
     description
-      "Any primitive type.";
-    amm:union {
-      amm:type "/ARITYPE/null";
-      amm:type "/ARITYPE/bool";
-      amm:type "./TYPEDEF/numeric";
-      amm:type "/ARITYPE/textstr";
-      amm:type "/ARITYPE/bytestr";
+      "Any primitive type.
+       This union order prefers conversion to wide types.";
+    type union {
+      type numeric;
+      type ari:textstr;
+      type ari:bytestr;
+      type ari:bool;
+      // null is last option for conversion
+      type ari:null;
     }
   }
-  amm:typedef time {
+  typedef time {
     amm:enum 5;
     description
       "Any type which can be used with time expressions.";
-    amm:union {
-      amm:type "/ARITYPE/TP";
-      amm:type "/ARITYPE/TD";
+    type union {
+      type ari:TP;
+      type ari:TD;
     }
   }
-  amm:typedef simple {
+  typedef simple {
     amm:enum 6;
     description
       "Any type which contains a single literal value (not nested).";
-    amm:union {
-      amm:type "./TYPEDEF/PRIMITIVE";
-      amm:type "./TYPEDEF/TIME";
+    type union {
+      type TIME;
+      type PRIMITIVE;
     }
   }
-  amm:typedef nested {
+  typedef nested {
     amm:enum 7;
     description
       "A literal type which contains other ARI values.";
-    amm:union {
-      amm:type "/ARITYPE/AC";
-      amm:type "/ARITYPE/AM";
-      amm:type "/ARITYPE/TBL";
+    type union {
+      type ari:AC;
+      type ari:AM;
+      type ari:TBL;
     }
   }
-  amm:typedef any {
+  typedef any {
     amm:enum 8;
     description
       "Any value representable by an ARI.";
     // These type names are built-in
-    amm:union {
-      amm:type "/ARITYPE/literal";
-      amm:type "/ARITYPE/object";
+    type union {
+      type ari:literal;
+      type ari:object;
+      type ari:namespace;
     }
   }
-  amm:typedef value-obj {
+  typedef value-obj {
     amm:enum 9;
     description
       "A reference to an object which can produce a value.";
-    amm:union {
-      amm:type "/ARITYPE/const";
-      amm:type "/ARITYPE/edd";
-      amm:type "/ARITYPE/var";
+    type union {
+      type ari:const;
+      type ari:edd;
+      type ari:var;
     }
   }
-  amm:typedef nonce {
+  typedef nonce {
     amm:enum 10;
     description
       "This type union is used to correlate Agent-Manager messages.
        The union is defined in Section 4.2.5 of draft-ietf-dtn-amm.";
     reference
       "draft-ietf-dtn-amm";
-    amm:union {
-      amm:type "/ARITYPE/bytestr";
-      amm:type "/ARITYPE/uvast";
-      amm:type "/ARITYPE/null";
+    type union {
+      type ari:bytestr;
+      type ari:uvast;
+      type ari:null;
     }
   }
-  amm:typedef id-text {
+  typedef id-text {
     amm:enum 25;
     description
       "This type is used to define and match object text names.
        The type is defined in Section 4.2.5 of draft-ietf-dtn-amm.";
     reference
       "draft-ietf-dtn-amm";
-    amm:type "/ARITYPE/textstr" {
-      pattern '[A-Za-z_][0-9A-Za-z_\-\.]*';
+    type ari:textstr {
+      pattern '!?[A-Za-z_][0-9A-Za-z_\-\.]*';
     }
   }
-  amm:typedef id-int {
+  typedef id-int {
     amm:enum 26;
     description
       "This type is used to define and match object integer
@@ -3563,11 +4006,11 @@ This includes the following:
        The type is defined in Section 4.2.5 of draft-ietf-dtn-amm.";
     reference
       "draft-ietf-dtn-amm";
-    amm:type "/ARITYPE/int";
+    type ari:int;
   }
 
   // operational semantic types
-  amm:typedef counter32 {
+  typedef counter32 {
     amm:enum 11;
     description
       "A 32-bit counter with an arbitrary initial value which can
@@ -3581,9 +4024,9 @@ This includes the following:
     reference
       "RFC 2578: Structure of Management Information Version 2
        RFC 6021: Common YANG Data Types";
-    amm:type "/ARITYPE/uint";
+    type ari:uint;
   }
-  amm:typedef counter64 {
+  typedef counter64 {
     amm:enum 12;
     description
       "A 64-bit counter with an arbitrary initial value which can
@@ -3597,9 +4040,9 @@ This includes the following:
     reference
       "RFC 2578: Structure of Management Information Version 2
        RFC 6021: Common YANG Data Types";
-    amm:type "/ARITYPE/uvast";
+    type ari:uvast;
   }
-  amm:typedef gauge32 {
+  typedef gauge32 {
     amm:enum 13;
     description
       "A 32-bit value sampling some quantized measurement.
@@ -3609,9 +4052,9 @@ This includes the following:
     reference
       "RFC 2578: Structure of Management Information Version 2
        RFC 6021: Common YANG Data Types";
-    amm:type "/ARITYPE/int";
+    type ari:int;
   }
-  amm:typedef gauge64 {
+  typedef gauge64 {
     amm:enum 14;
     description
       "A 64-bit value sampling some quantized measurement.
@@ -3621,9 +4064,9 @@ This includes the following:
     reference
       "RFC 2578: Structure of Management Information Version 2
        RFC 6021: Common YANG Data Types";
-    amm:type "/ARITYPE/vast";
+    type ari:vast;
   }
-  amm:typedef timestamp {
+  typedef timestamp {
     amm:enum 15;
     description
       "A time point representing the system clock at which a specific
@@ -3635,128 +4078,117 @@ This includes the following:
     reference
       "RFC 2579: Textual Conventions for SMIv2
        RFC 6021: Common YANG Data Types";
-    amm:type "/ARITYPE/tp";
+    type ari:tp;
   }
 
   // Restrictions on AC item types for Evaluation and EXPR
-  amm:typedef eval-tgt {
+  typedef eval-tgt {
     amm:enum 16;
     description
-      "A value which can be the target of an evaluation.";
-    amm:union {
-      // special case of literal value result
-      amm:type "./TYPEDEF/simple";
-      // produces an eval-tgt
-      amm:type "./TYPEDEF/value-obj";
-      amm:type "./TYPEDEF/expr";
+      "A value which can be the target of an evaluation.
+       An inline &lt;./typedef/expr&gt; value is evaluated directly.
+       A reference to a value-producing object is dereferenced and
+       SHALL produce a value that matches &lt;./typedef/expr&gt;, which
+       is then evaluated.";
+    type union {
+      // object which produces an expression
+      type value-obj;
+      // inline expression
+      type expr;
     }
   }
-  amm:typedef expr-item {
+  typedef expr-item {
     amm:enum 17;
     description
       "Each item of an EXPR list.";
-    amm:union {
-      amm:type "./TYPEDEF/simple";
-      // produces an eval-tgt
-      amm:type "./TYPEDEF/value-obj";
-      // treated as unary operator
-      amm:type "./TYPEDEF/type-ref";
-      // substitutable label of an external context value
-      amm:type "/ARITYPE/label";
-      amm:type "/ARITYPE/oper";
+    type union {
+      // plain value for the stack
+      type ari:literal;
+      // object which produces a value for the stack
+      type value-obj;
+      // operator to evaluate
+      type ari:oper;
     }
   }
-  amm:typedef expr {
+  typedef expr {
     amm:enum 18;
     description
       "The contents of an EXPR container.";
     amm:ulist {
-      amm:type "./TYPEDEF/expr-item";
+      type expr-item;
     }
   }
 
   // Restrictions on AC item types for Execution and MAC
-  amm:typedef exec-tgt {
+  typedef exec-tgt {
     amm:enum 19;
     description
-      "A value which can be the target of an execution.";
-    amm:union {
-      amm:type "./TYPEDEF/exec-item";
-      amm:type "./TYPEDEF/mac";
+      "A value which can be the target of an execution.
+       An inline &lt;./typedef/mac&gt; value is expanded and executed.
+       A reference to a value-producing object is dereferenced and
+       SHALL produce a value that matches &lt;./typedef/exec-tgt&gt;,
+       which is then executed.
+       A reference to a CTRL is executed directly.";
+    type union {
+      type exec-item;
+      // inline MAC
+      type mac;
     }
   }
-  amm:typedef exec-item {
+  typedef exec-item {
     amm:enum 20;
     description
       "A reference to an object which can be executed.
-       The value-object must be typed to contain an exec-tgt.";
-    amm:union {
-      amm:type "/ARITYPE/ctrl";
-      amm:type "./TYPEDEF/value-obj"; // produces an exec-tgt
+       The value-object must be typed to contain a
+       &lt;./typedef/exec-tgt&gt;.";
+    type union {
+      type ari:ctrl;
+      // object which produces an exec-tgt
+      type value-obj;
     }
   }
-  amm:typedef mac {
+  typedef mac {
     amm:enum 21;
     description
       "The contents of a MAC container are an ordered list of
        executable values.";
     amm:ulist {
-      amm:type "./TYPEDEF/exec-item";
+      type exec-item;
     }
   }
 
   // Restrictions on AC item types for Reporting and RPTT
-  amm:typedef rpt-tgt {
+  typedef rpt-tgt {
     amm:enum 22;
     description
       "A value which can be the target of reporting.";
-    amm:union {
-      amm:type "./TYPEDEF/value-obj"; // produces an RPTT
-      amm:type "./TYPEDEF/rptt";
+    type union {
+      // object which produces an RPTT
+      type value-obj;
+      // inline RPTT
+      type rptt;
     }
   }
-  amm:typedef rptt-item {
+  typedef rptt-item {
     amm:enum 23;
     description
       "Each item of a RPTT.
        Each item references a value-producing object or contains an
        expression to be evaluated.";
-    amm:union {
+    type union {
       // produces the report item
-      amm:type "./TYPEDEF/value-obj";
+      type value-obj;
       // evaluates to the report item
-      amm:type "./TYPEDEF/expr";
+      type expr;
     }
   }
-  amm:typedef rptt {
+  typedef rptt {
     amm:enum 24;
     description
       "The contents of a report template, encoded as the sequence
        of template items.";
     amm:ulist {
-      amm:type "./TYPEDEF/rptt-item";
-    }
-  }
-
-  // Representation of ARI patterns as values
-  amm:ident bstr-ari-pattern {
-    amm:enum 5;
-    description
-      "Represent a binary form of ARI Pattern as human-friendly
-       text form, converting identifiers if possible based on ADM
-       and ODM contents.";
-    reference
-      "draft-ietf-dtn-adm-yang";
-    amm:base "./ident/display-hint-bstr";
-  }
-  amm:typedef ari-pattern {
-    amm:enum 27;
-    description
-      "The value type for an ARI pattern in binary form.";
-    reference
-      "draft-ietf-dtn-adm-yang";
-    amm:type "/aritype/cbor" {
-      amm:display-hint "./ident/bstr-ari-pattern";
+      type rptt-item;
     }
   }
 }
@@ -3818,7 +4250,7 @@ Specific networking technologies and protocols can derive from the abstract base
   reference
     "draft-ietf-dtn-adm-yang";
 
-  revision 2025-07-03 {
+  revision 2026-04-02 {
     description
       "Updated for latest ADM document.";
     reference
@@ -3827,7 +4259,7 @@ Specific networking technologies and protocols can derive from the abstract base
   amm:enum 26;
 
   // General purpose network data types and forms
-  amm:typedef uri {
+  typedef uri {
     amm:enum 0;
     description
       "A specialization of the textstr type to only contain a single
@@ -3864,21 +4296,21 @@ Specific networking technologies and protocols can derive from the abstract base
                  and Recommendations
        RFC 5017: MIB Textual Conventions for Uniform Resource
                  Identifiers (URIs)";
-    amm:type "/aritype/textstr" {
+    type ari:textstr {
       // This pattern is on the normalized scheme
       pattern '[a-z][a-z0-9+-.]*:.*';
     }
   }
-  amm:ident display-bstr-uuid {
+  identity display-bstr-uuid {
     amm:enum 17;
     description
       "Interpret byte string values as UUID and display as
        human-friendly text according to RFC 9562 conventions.";
     reference
       "RFC 9562: Universally Unique IDentifiers (UUIDs)";
-    amm:base "//ietf/amm-base/IDENT/display-hint-bstr";
+    base amm-type:display-hint-bstr;
   }
-  amm:typedef uuid {
+  typedef uuid {
     amm:enum 5;
     description
       "A specialization of the bytestr type to contain a binary
@@ -3887,11 +4319,11 @@ Specific networking technologies and protocols can derive from the abstract base
        as defined in Section 4 of RFC 9562.";
     reference
       "RFC 9562: Universally Unique IDentifiers (UUIDs)";
-    amm:type "/aritype/bytestr" {
+    type ari:bytestr {
       length "16";
     }
   }
-  amm:ident display-bstr-oid {
+  identity display-bstr-oid {
     amm:enum 18;
     description
       "Interpret byte string values as ASN.1 BER-encoded OIDs
@@ -3900,9 +4332,9 @@ Specific networking technologies and protocols can derive from the abstract base
     reference
       "ITU-T X.660-2011: General procedures and top arcs of the
          international object identifier tree";
-    amm:base "//ietf/amm-base/IDENT/display-hint-bstr";
+    base amm-type:display-hint-bstr;
   }
-  amm:typedef oid {
+  typedef oid {
     amm:enum 4;
     description
       "A specialization of the bytestr type to contain an ASN.1
@@ -3911,7 +4343,7 @@ Specific networking technologies and protocols can derive from the abstract base
        the byte string value but does constrain it by these
        requirements.
        Values of this type SHALL contain valid BER-encoded OID
-       contents consistent with the definiton of CBOR tag 111
+       contents consistent with the definition of CBOR tag 111
        but without the actual tag, as defined in Section 2.1 of
        RFC 9090.
        Values of this type always contain an absolute OID.";
@@ -3923,13 +4355,13 @@ Specific networking technologies and protocols can derive from the abstract base
        ITU-T X.690-2021: ASN.1 encoding rules: Specification of
          Basic Encoding Rules (BER), Canonical Encoding
          Rules (CER) and Distinguished Encoding Rules (DER)";
-    amm:type "/aritype/bytestr" {
+    type ari:bytestr {
       length "2..max";
     }
   }
 
   // Abstract base IDENTs and types
-  amm:ident abstract-endpoint {
+  identity abstract-endpoint {
     amm:enum 0;
     description
       "This object defines an abstract base for all general purpose
@@ -3940,64 +4372,23 @@ Specific networking technologies and protocols can derive from the abstract base
        present in this object hierarchy.";
     amm:abstract true;
   }
-  amm:typedef endpoint {
+  typedef endpoint {
     amm:enum 1;
     description
       "A value which references a non-abstract derived object
        for specific types of network or transport endpoints.";
-    amm:type "/aritype/ident" {
-      amm:base "./IDENT/abstract-endpoint";
+    type ari:ident {
+      base abstract-endpoint;
     }
   }
-  amm:typedef endpoint-or-uri {
+  typedef endpoint-or-uri {
     amm:enum 3;
     description
       "A value which is either a specific parameterized endpoint
        IDENT reference or a text URI value identifying an endpoint.";
-    amm:union {
-      amm:type "./typedef/endpoint";
-      amm:type "./typedef/uri";
-    }
-  }
-  amm:ident abstract-endpoint-pattern {
-    amm:enum 1;
-    description
-      "This object defines an abstract base for general purpose
-       network/transport endpoint pattern matching.
-       Each derived type is expected to match only a single object
-       derived from &lt;./IDENT/abstract-endpoint&gt;.
-       Each pattern SHALL specify in its descriptions which types
-       of endpoints can possibly match the pattern.";
-    amm:abstract true;
-  }
-  amm:typedef endpoint-pattern {
-    amm:enum 2;
-    description
-      "A value which references a non-abstract derived pattern object
-       for specific types of network or transport endpoints.";
-    amm:type "/aritype/ident" {
-      amm:base "./IDENT/abstract-endpoint-pattern";
-    }
-  }
-
-  // general-purpose leaf IDENTs
-  amm:ident uri-regexp-pattern {
-    amm:enum 2;
-    description
-      "This object defines a means to match a full URI using a
-       regular expression limited to I-Regexp compatibility.
-       This only allows matching text values, more specifically those that
-       already match the &lt;./typedef/uri&gt; semantic type.";
-    reference
-      "RFC 9485: I-Regexp: An Interoperable Regular Expression Format";
-    amm:base "//ietf/network-base/ident/abstract-endpoint-pattern";
-    amm:parameter regexp {
-      description
-        "The I-Regexp text pattern to match.
-         In accordance with that definition, this pattern is implicitly
-         anchored to the start and end of the text being matched
-         (i.e. it is always a full match).";
-      amm:type "/aritype/textstr";
+    type union {
+      type endpoint;
+      type uri;
     }
   }
 }
@@ -4069,91 +4460,91 @@ The ADM module in this section defines display-hint-derived IDENT objects descri
   amm:enum 0;
 
   // Integer number hints
-  amm:ident display-int-dec {
+  identity display-int-dec {
     amm:enum 2;
     description
       "Display integers as decimal (base 10).";
-    amm:base "//ietf/amm-base/ident/display-hint-integer";
+    base amm-type:display-hint-integer;
   }
-  amm:ident display-int-bin {
+  identity display-int-bin {
     amm:enum 3;
     description
       "Display integers as binary (base 2).";
-    amm:base "//ietf/amm-base/ident/display-hint-integer";
+    base amm-type:display-hint-integer;
   }
-  amm:ident display-int-hex {
+  identity display-int-hex {
     amm:enum 4;
     description
       "Display integers as hexadecimal (base 16).";
-    amm:base "//ietf/amm-base/ident/display-hint-integer";
+    base amm-type:display-hint-integer;
   }
 
   // Floating-point number hints
-  amm:ident display-float-dec {
+  identity display-float-dec {
     amm:enum 6;
     description
       "Display floating point values as decimal fraction.";
-    amm:base "//ietf/amm-base/ident/display-hint-float";
+    base amm-type:display-hint-float;
   }
-  amm:ident display-float-exp {
+  identity display-float-exp {
     amm:enum 7;
     description
       "Display floating point values as decimal exponential form.";
-    amm:base "//ietf/amm-base/ident/display-hint-float";
+    base amm-type:display-hint-float;
   }
-  amm:ident display-float-hex {
+  identity display-float-hex {
     amm:enum 8;
     description
       "Display floating point values as hexadecimal exponential
        form.";
-    amm:base "//ietf/amm-base/ident/display-hint-float";
+    base amm-type:display-hint-float;
   }
 
   // Byte-string hints
-  amm:ident display-bstr-text {
+  identity display-bstr-text {
     amm:enum 10;
     description
       "Display byte string values as UTF-8 text where possible.
        The base16 encoding is used otherwise.";
     reference
       "draft-ietf-dtn-ari";
-    amm:base "//ietf/amm-base/ident/display-hint-bstr";
+    base amm-type:display-hint-bstr;
   }
-  amm:ident display-bstr-base16 {
+  identity display-bstr-base16 {
     amm:enum 11;
     description
       "Display byte string values as base16-encoded.";
     reference
       "draft-ietf-dtn-ari";
-    amm:base "//ietf/amm-base/ident/display-hint-bstr";
+    base amm-type:display-hint-bstr;
   }
-  amm:ident display-bstr-base64 {
+  identity display-bstr-base64 {
     amm:enum 12;
     description
       "Display byte string values as base64url-encoded.";
     reference
       "draft-ietf-dtn-ari";
-    amm:base "//ietf/amm-base/ident/display-hint-bstr";
+    base amm-type:display-hint-bstr;
   }
 
   // TIME type (TP or TD built-ins) hints
-  amm:ident display-time-text {
+  identity display-time-text {
     amm:enum 14;
     description
       "Display TP and TD values as text in accordance with
        RFC 3339 not using separator characters.";
     reference
       "draft-ietf-dtn-ari";
-    amm:base "//ietf/amm-base/ident/display-hint-time";
+    base amm-type:display-hint-time;
   }
-  amm:ident display-time-dec {
+  identity display-time-dec {
     amm:enum 15;
     description
       "Display TP and TD values as decimal fraction with units of
        seconds, which may or may not include a fractional part.";
     reference
       "draft-ietf-dtn-ari";
-    amm:base "//ietf/amm-base/ident/display-hint-time";
+    base amm-type:display-hint-time;
   }
 }
 </sourcecode>
@@ -4225,7 +4616,7 @@ This includes the following:
   reference
     "draft-ietf-dtn-adm-yang";
 
-  revision 2025-07-03 {
+  revision 2026-05-01 {
     description
       "Updated for latest ADM document.";
     reference
@@ -4235,7 +4626,22 @@ This includes the following:
   feature rules {
     description
       "Conforming to this feature enables time-based and
-       state-based autonomy rules.";
+       state-based autonomy rules.
+       A basic implementation can omit these and only allow
+       direct manager execution without rules.
+       Even without rules, an application can choose to
+       generate and send reports at-will using internal
+       Agent--application API.";
+  }
+
+  feature exec-control {
+    description
+      "Conforming to this feature enables controls which
+       allow advanced sequencing of execution flows
+       in an Agent.
+       A basic implementation can omit these controls and
+       allow only straightforward linear execution sequences
+       with no waiting and no conditional branching.";
   }
 
   grouping obj-list-params {
@@ -4245,7 +4651,7 @@ This includes the following:
       description
         "If true, listings will include objects from ADMs";
       amm:default "false";
-      amm:type "/aritype/BOOL";
+      type ari:bool;
     }
   }
 
@@ -4264,32 +4670,48 @@ This includes the following:
     amm:parameter namespace {
       description
         "The parent ODM namespace.";
-      amm:type "/aritype/namespace";
+      type ari:namespace;
     }
     amm:parameter obj-name {
       description
         "Text name for the desired object.";
-      amm:type "//ietf/amm-base/typedef/id-text";
+      type amm-type:typedef;
     }
     amm:parameter obj-enum {
       description
         "Integer enumeration for the desired object.";
-      amm:type "//ietf/amm-base/typedef/id-int";
+      type amm-type:typedef;
+    }
+  }
+
+  grouping ensure-object-params {
+    description
+      "Common parameter for providing formal parameter
+       definitions to ensure an object exists in an ODM.
+
+       When this grouping is used it should be after all of
+       the mandatory parameters (those with no default value)
+       to allow the default no-formal-parameters to be used.";
+    amm:parameter formal-params {
+      description
+        "An optional list of formal parameters for the object.";
+      amm:default "/tbl/c=3;";
+      type formal-params-tbl;
     }
   }
 
   grouping any-binary-operands {
     description
-      "Any-value bianry operands";
+      "Any-value binary operands";
     amm:operand left {
       description
         "The left-side operand.";
-      amm:type "//ietf/amm-base/typedef/any";
+      type amm-type:typedef;
     }
     amm:operand right {
       description
         "The left-side operand.";
-      amm:type "//ietf/amm-base/typedef/any";
+      type amm-type:typedef;
     }
   }
 
@@ -4299,32 +4721,37 @@ This includes the following:
     amm:result result {
       description
         "The single value.";
-      amm:type "//ietf/amm-base/typedef/any";
+      type amm-type:typedef;
     }
   }
 
-  grouping numeric-unary-operands {
+  grouping numeric-time-binary-operands {
     description
-      "Numeric unary operand";
-    amm:operand val {
+      "Numeric or time binary operands";
+    amm:operand left {
       description
-        "The single value.";
-      amm:type "//ietf/amm-base/typedef/NUMERIC";
+        "The left-side operand.";
+      type amm-type:typedef;
+    }
+    amm:operand right {
+      description
+        "The left-side operand.";
+      type amm-type:typedef;
     }
   }
 
   grouping numeric-binary-operands {
     description
-      "Numeric bianry operands";
+      "Numeric binary operands";
     amm:operand left {
       description
         "The left-side operand.";
-      amm:type "//ietf/amm-base/typedef/NUMERIC";
+      type amm-type:typedef;
     }
     amm:operand right {
       description
         "The left-side operand.";
-      amm:type "//ietf/amm-base/typedef/NUMERIC";
+      type amm-type:typedef;
     }
   }
 
@@ -4334,7 +4761,7 @@ This includes the following:
     amm:result result {
       description
         "The single value.";
-      amm:type "//ietf/amm-base/typedef/NUMERIC";
+      type amm-type:typedef;
     }
   }
 
@@ -4344,22 +4771,22 @@ This includes the following:
     amm:operand val {
       description
         "The single value.";
-      amm:type "//ietf/amm-base/typedef/INTEGER";
+      type amm-type:typedef;
     }
   }
 
   grouping integer-binary-operands {
     description
-      "Integer bianry operands";
+      "Integer binary operands";
     amm:operand left {
       description
         "The left-side operand.";
-      amm:type "//ietf/amm-base/typedef/INTEGER";
+      type amm-type:typedef;
     }
     amm:operand right {
       description
         "The left-side operand.";
-      amm:type "//ietf/amm-base/typedef/INTEGER";
+      type amm-type:typedef;
     }
   }
 
@@ -4369,7 +4796,7 @@ This includes the following:
     amm:result result {
       description
         "The single value.";
-      amm:type "//ietf/amm-base/typedef/INTEGER";
+      type amm-type:typedef;
     }
   }
 
@@ -4379,22 +4806,22 @@ This includes the following:
     amm:operand val {
       description
         "The single value.";
-      amm:type "/aritype/BOOL";
+      type ari:bool;
     }
   }
 
   grouping bool-binary-operands {
     description
-      "Boolean bianry operands";
+      "Boolean binary operands";
     amm:operand left {
       description
         "The left-side operand.";
-      amm:type "/aritype/BOOL";
+      type ari:bool;
     }
     amm:operand right {
       description
         "The left-side operand.";
-      amm:type "/aritype/BOOL";
+      type ari:bool;
     }
   }
 
@@ -4404,7 +4831,32 @@ This includes the following:
     amm:result result {
       description
         "The single value.";
-      amm:type "/aritype/BOOL";
+      type ari:bool;
+    }
+  }
+
+  grouping predicate-compose-interface {
+    description
+      "A common interface for all predicate composition
+       operators below.";
+    amm:parameter operators {
+      description
+        "The list of other predicate operators to evaluate and
+         combine their results.";
+      amm:ulist {
+        type ari:oper;
+      }
+    }
+    amm:operand value {
+      description
+        "The value to pass-through and evaluate with each of the
+         subordinate operators.";
+      type amm-type:typedef;
+    }
+    amm:result combined {
+      description
+        "The combined boolean result.";
+      type ari:bool;
     }
   }
 
@@ -4413,13 +4865,13 @@ This includes the following:
     amm:enum 0;
     description
       "The vendor for this Agent implementation.";
-    amm:type "/aritype/TEXTSTR";
+    type ari:textstr;
   }
   amm:edd sw-version {
     amm:enum 1;
     description
       "The version for this Agent implementation.";
-    amm:type "/aritype/TEXTSTR";
+    type ari:textstr;
   }
   amm:edd capability {
     amm:enum 2;
@@ -4430,33 +4882,33 @@ This includes the following:
       amm:column org-name {
         description
           "The organization name containing the ADM";
-        amm:type "/aritype/TEXTSTR";
+        type ari:textstr;
       }
       amm:column org-enum {
         description
           "The organization enumeration containing the ADM";
-        amm:type "/aritype/VAST";
+        type ari:vast;
       }
       amm:column model-name {
         description
           "The model name of the ADM";
-        amm:type "/aritype/TEXTSTR";
+        type ari:textstr;
       }
       amm:column model-enum {
         description
           "The model enumeration of the ADM";
-        amm:type "/aritype/VAST";
+        type ari:vast;
       }
       amm:column revision {
         description
           "The specific revision the agent supports.";
-        amm:type "/aritype/TEXTSTR";
+        type ari:textstr;
       }
       amm:column features {
         description
           "The features of the ADM which the agent supports.";
         amm:ulist {
-          amm:type "/aritype/TEXTSTR";
+          type ari:textstr;
         }
       }
     }
@@ -4468,62 +4920,106 @@ This includes the following:
        on a network.";
     amm:init-value "/AC/(./EDD/sw-vendor,./EDD/sw-version,"
                  + "./EDD/capability)";
-    amm:type "//ietf/amm-base/typedef/RPTT";
+    type amm-type:typedef;
   }
 
   // Messaging counters
   amm:edd num-msg-rx {
     amm:enum 3;
-    amm:type "//ietf/amm-base/typedef/counter64";
+    description
+      "Counter of the number of AMP messages of any type received
+       from any manager.";
+    type amm-type:typedef;
   }
   amm:edd num-msg-rx-failed {
     amm:enum 4;
-    amm:type "//ietf/amm-base/typedef/counter64";
+    description
+      "Counter of received EXECSET values that failed to be decoded
+       and processed.";
+    type amm-type:typedef;
   }
   amm:edd num-msg-tx {
     amm:enum 5;
-    amm:type "//ietf/amm-base/typedef/counter64";
+    description
+      "Counter of the number of AMP messages of any type transmitted
+       to any manager.";
+    type amm-type:typedef;
   }
   amm:edd num-msg-tx-failed {
     amm:enum 15;
-    amm:type "//ietf/amm-base/typedef/counter64";
+    description
+      "Counter of RPTSET values that encoded but failed to be sent.";
+    type amm-type:typedef;
   }
   amm:edd last-msg-rx-time {
     amm:enum 17;
-    amm:type "/aritype/TP";
+    description
+      "A timestamp on the Agent when the latest AMP message was
+       received from any manager.";
+    type ari:tp;
   }
 
   // Execution counters and states
   amm:edd num-exec-started {
     amm:enum 6;
-    amm:type "//ietf/amm-base/typedef/counter64";
+    description
+      "Number of CTRL executions started.
+       This does not include EXECSETs which have been received and
+       are still queued for execution.
+       See &lt;./edd/exec-running&gt; table for those details.";
+    type amm-type:typedef;
   }
   amm:edd num-exec-succeeded {
     amm:enum 7;
-    amm:type "//ietf/amm-base/typedef/counter64";
+    description
+      "Number of successful CTRL executions.
+       This means the CTRL result was not undefined.";
+    type amm-type:typedef;
   }
   amm:edd num-exec-failed {
     amm:enum 8;
-    amm:type "//ietf/amm-base/typedef/counter64";
+    description
+      "Number of failed CTRL executions.
+       This means the CTRL result was undefined.";
+    type amm-type:typedef;
   }
   amm:edd exec-running {
     amm:enum 9;
+    description
+      "Information on controls currently being executed.
+       This represents tracking of execution requests from
+       received EXECSET values until the entire execution is
+       finished (successfully or not).
+       Once finished, the Agent SHALL remove the associated row
+       from this table and never re-use its 'pid' value.";
     amm:tblt {
       amm:key "pid";
       amm:column pid {
-        amm:type "/aritype/UVAST";
+        description
+          "An identifier internal to an Agent used to correlate
+           table rows over time.
+           An implementation MAY assign values from a smaller
+           domain than this column can represent.";
+        type ari:uvast;
       }
       amm:column target {
-        amm:type "//ietf/amm-base/typedef/any";
+        description
+          "The original, full target of the execution.
+           This can be an inline MAC or a CTRL reference.";
+        type amm-type:typedef;
       }
       amm:column state {
-        amm:type "/aritype/BYTE" {
+        description
+          "The state of executing the target within the Agent.";
+        type ari:byte {
           amm:int-labels {
             enum waiting {
               value 0;
               description
                 "The execution is waiting on a condition or timer
-                 to continue.";
+                 to continue.
+                 This includes waiting on Agent resources for the
+                 execution itself.";
             }
             enum running {
               value 1;
@@ -4538,65 +5034,108 @@ This includes the following:
 
   // MAC helper controls
   amm:ctrl if-then-else {
+    if-feature "exec-control";
     amm:enum 0;
     description
       "Evaluate an expression and follow one of two branches of
        further evaluation.";
     amm:parameter condition {
       description
-        "The condition to evaluate.";
-      amm:type "//ietf/amm-base/typedef/eval-tgt";
+        "The condition (inline or reference) to evaluate and
+         convert to BOOL type.";
+      type amm-type:typedef;
     }
     amm:parameter on-truthy {
       description
-        "The object to execute when the condition is truthy.";
+        "The target to execute when the condition is truthy.";
       amm:default "null";
-      amm:union {
-        amm:type "//ietf/amm-base/typedef/exec-tgt";
-        amm:type "/aritype/NULL";
+      type union {
+        type amm-type:typedef;
+        type ari:null;
       }
     }
     amm:parameter on-falsy {
       description
-        "An optional execution when the condition is falsey.";
+        "An optional target to execute when the condition is
+         not truthy (including if evaluates to undefined).";
       amm:default "null";
-      amm:union {
-        amm:type "//ietf/amm-base/typedef/exec-tgt";
-        amm:type "/aritype/NULL";
+      type union {
+        type amm-type:typedef;
+        type ari:null;
       }
     }
     amm:result branch {
       description
         "Indication of which branch was executed.";
-      amm:type "/aritype/BOOL";
+      type ari:bool;
     }
   }
   amm:ctrl catch {
+    if-feature "exec-control";
     amm:enum 1;
     description
       "Attempt to execute a target, and if there is some failure
        catch it and execute an alternative target.";
     amm:parameter try {
       description
-        "The object to execute.";
-      amm:type "//ietf/amm-base/typedef/exec-tgt";
+        "The target to execute.";
+      type amm-type:typedef;
     }
     amm:parameter on-failure {
       description
-        "An optional execution after failure.";
+        "An optional target to execute after failure.";
       amm:default "null";
-      amm:union {
-        amm:type "//ietf/amm-base/typedef/exec-tgt";
-        amm:type "/aritype/NULL";
+      type union {
+        type amm-type:typedef;
+        type ari:null;
       }
     }
     amm:result try-success {
       description
         "True if the try target succeeded without exception.";
-      amm:type "/aritype/BOOL";
+      type ari:bool;
+    }
+  }
+  amm:ctrl exec-deadline {
+    amm:enum 22;
+    description
+      "Execute a desired target and wait for it to finish before
+       a relative time deadline.
+       If it does not finish, it is terminated and an alternative
+       timeout target is executed.
+       If the target experiences a failure executing before the
+       deadline, then this control will also fail.";
+    amm:parameter target {
+      description
+        "The target to execute.";
+      type amm-type:typedef;
+    }
+    amm:parameter deadline {
+      description
+        "The relative of time on the Agent to wait for
+         the target to finish executing.";
+      type ari:td;
+    }
+    amm:parameter on-timeout {
+      description
+        "An optional target to execute after a timeout.";
+      amm:default "null";
+      type union {
+        type amm-type:typedef;
+        type ari:null;
+      }
+    }
+    amm:result success {
+      description
+        "True if the target sub-execution succeeded before the
+         deadline, false if the execution did not finish before,
+         and undefined if the execution failed before the
+         deadline.";
+      type ari:bool;
     }
   }
   amm:ctrl wait-for {
+    if-feature "exec-control";
     amm:enum 2;
     description
       "This control causes the execution to pause for a given
@@ -4604,10 +5143,13 @@ This includes the following:
        This is intended to be used within a macro to separate
        controls in time.";
     amm:parameter duration {
-      amm:type "/aritype/TD";
+      description
+        "The relative of time on the Agent to wait for.";
+      type ari:td;
     }
   }
   amm:ctrl wait-until {
+    if-feature "exec-control";
     amm:enum 3;
     description
       "This control causes the execution to pause until a specific
@@ -4616,10 +5158,13 @@ This includes the following:
        controls in time or as a first macro item to delay execution
        after the time of reception.";
     amm:parameter time {
-      amm:type "/aritype/TP";
+      description
+        "The absolute Agent time at which to stop waiting.";
+      type ari:tp;
     }
   }
   amm:ctrl wait-cond {
+    if-feature "exec-control";
     amm:enum 4;
     description
       "This control causes the execution to pause until a condition
@@ -4628,7 +5173,22 @@ This includes the following:
        controls in time or as a first macro item to delay execution
        until the condition is met.";
     amm:parameter condition {
-      amm:type "//ietf/amm-base/typedef/eval-tgt";
+      description
+        "The condition (inline or reference) to evaluate and
+         convert to BOOL type.";
+      type amm-type:typedef;
+    }
+    amm:parameter min-interval {
+      description
+        "An optional hint used by an Agent to limit how frequently
+         the condition is evaluated.
+         If this is null, an implementation-defined default will
+         be used.";
+      amm:default "null";
+      type union {
+        type ari:td;
+        type ari:null;
+      }
     }
   }
 
@@ -4641,12 +5201,12 @@ This includes the following:
     amm:parameter ref {
       description
         "An object to produce a value from.";
-      amm:type "//ietf/amm-base/typedef/VALUE-OBJ";
+      type amm-type:typedef;
     }
     amm:result val {
       description
         "The produced value.";
-      amm:type "//ietf/amm-base/typedef/any";
+      type amm-type:typedef;
     }
   }
   amm:ctrl report-on {
@@ -4665,7 +5225,7 @@ This includes the following:
         "The reporting template, either as a RPTT value directly or
          as a reference to a value-producing object (possibly
          parameterized) which itself produces an RPTT value.";
-      amm:type "//ietf/amm-base/typedef/rpt-tgt";
+      type amm-type:typedef;
     }
     amm:parameter destinations {
       description
@@ -4680,7 +5240,7 @@ This includes the following:
          contents.";
       amm:default "/ac/()";
       amm:ulist {
-        amm:type "//ietf/network-base/typedef/endpoint-or-uri";
+        type network-base:typedef;
       }
     }
   }
@@ -4695,27 +5255,27 @@ This includes the following:
       amm:column org-name {
         description
           "The organization name containing the ODM";
-        amm:type "//ietf/amm-base/typedef/id-text";
+        type amm-type:typedef;
       }
       amm:column org-enum {
         description
           "The organization enumeration containing the ODM";
-        amm:type "//ietf/amm-base/typedef/id-int";
+        type amm-type:typedef;
       }
       amm:column model-name {
         description
           "The model name of the ODM";
-        amm:type "//ietf/amm-base/typedef/id-text";
+        type amm-type:typedef;
       }
       amm:column model-enum {
         description
           "The model enumeration of the ODM";
-        amm:type "//ietf/amm-base/typedef/id-int";
+        type amm-type:typedef;
       }
       amm:column revision {
         description
           "The specific revision the agent supports.";
-        amm:type "/aritype/TEXTSTR";
+        type ari:textstr;
       }
     }
   }
@@ -4729,24 +5289,28 @@ This includes the following:
     amm:parameter org-name {
       description
         "The organization name containing the ODM";
-      amm:type "//ietf/amm-base/typedef/id-text";
+      type amm-type:typedef;
     }
     amm:parameter org-id {
       description
         "The organization enumeration ID containing the ODM";
-      amm:type "//ietf/amm-base/typedef/id-int";
+      type amm-type:typedef;
     }
     amm:parameter model-name {
       description
-        "The model name containing the ODM.";
-      amm:type "//ietf/amm-base/typedef/id-text" {
+        "The model name containing the ODM.
+         This value SHALL have a leading bang to indicate that it
+         is an ODM.";
+      type amm-type:typedef {
         pattern '!.+';
       }
     }
     amm:parameter model-id {
       description
-        "The model enumeration ID containing the ODM";
-      amm:type "//ietf/amm-base/typedef/id-int" {
+        "The model enumeration ID containing the ODM.
+         This value SHALL be negative to indicate that it is
+         an ODM.";
+      type amm-type:typedef {
         range "min..-1";
       }
     }
@@ -4758,7 +5322,7 @@ This includes the following:
     amm:parameter odm-ns {
       description
         "Namespace of the ODM";
-      amm:type "/aritype/namespace";
+      type ari:namespace;
     }
   }
 
@@ -4770,7 +5334,7 @@ This includes the following:
     amm:parameter target {
       description
         "The VAR object to affect.";
-      amm:type "/aritype/VAR";
+      type ari:var;
     }
   }
   amm:ctrl var-store {
@@ -4780,12 +5344,90 @@ This includes the following:
     amm:parameter target {
       description
         "The VAR object to affect.";
-      amm:type "/aritype/VAR";
+      type ari:var;
     }
     amm:parameter value {
       description
         "The exact value to store in the VAR.";
-      amm:type "//ietf/amm-base/typedef/any";
+      type amm-type:typedef;
+    }
+  }
+
+  // Objects related to IDENT handling
+  amm:edd ident-list {
+    amm:enum 18;
+    description
+      "Inspect the set of (possibly filtered) IDENT objects known
+       to the Agent.
+       One possible filter is provided by the 'base' parameter to
+       limit to a specific subtree of objects. Another is whether
+       or not to include abstract objects in the list.";
+    uses obj-list-params;
+    amm:parameter include-abstract {
+      description
+        "Determine whether abstract objects are included in the
+         list (when true), or only non-abstract objects (when
+         false).";
+      amm:default "false";
+      type ari:bool;
+    }
+    amm:parameter base {
+      description
+        "The optional base object from which to traverse derived
+         objects. If this does not reference a known object the
+         produced list SHALL be empty.
+         The base object is not considered to be derived from
+         itself, so it SHALL NOT be present in the produced list.";
+      amm:default "null";
+      type union {
+        type ari:ident;
+        type ari:null;
+      }
+    }
+    amm:tblt {
+      amm:key "obj";
+      amm:column obj {
+        type ari:ident;
+      }
+      amm:column is-abstract {
+        type ari:bool;
+      }
+    }
+  }
+  amm:ctrl ensure-ident {
+    amm:enum 20;
+    description
+      "Ensure a specific IDENT is present in an ODM.
+       If an object already exists with the same identifiers,
+       parameters, and bases this control will do nothing
+       and succeed.
+       If an object already exists in the same namespace with either
+       of the object identifiers this control will fail.";
+    uses ensure-object-id;
+    amm:parameter abstract {
+      description
+        "If true the object is abstract and SHALL NOT contain any
+         formal parameters.";
+      type ari:bool;
+    }
+    amm:parameter bases {
+      description
+        "The set of base objects for this object.";
+      amm:ulist {
+        type ari:ident;
+      }
+    }
+    uses ensure-object-params;
+  }
+  amm:ctrl obsolete-ident {
+    amm:enum 21;
+    description
+      "Mark a specific IDENT as obsolete if it is present in an
+       ODM.";
+    amm:parameter obj {
+      description
+        "A reference to a IDENT within an ODM only.";
+      type ari:IDENT;
     }
   }
 
@@ -4798,7 +5440,7 @@ This includes the following:
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        amm:type "/aritype/typedef";
+        type amm:typedef;
       }
     }
   }
@@ -4812,10 +5454,10 @@ This includes the following:
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        amm:type "/aritype/CONST";
+        type ari:const;
       }
       amm:column type {
-        amm:type "//ietf/amm-semtype/typedef/semtype";
+        type amm-semtype:typedef;
       }
     }
   }
@@ -4823,21 +5465,52 @@ This includes the following:
     amm:enum 11;
     description
       "Ensure a specific CONST is present in an ODM.
-       If an object already exists with the same identifiers, type,
-       and value this control will do nothing and succeed.
+       If an object already exists with the same identifiers,
+       parameters, type, and value this control will do nothing
+       and succeed.
        If an object already exists in the same namespace with either
        of the object identifiers this control will fail.";
     uses ensure-object-id;
     amm:parameter type {
       description
         "The type for the CONST object.";
-      amm:type "//ietf/amm-semtype/typedef/semtype";
+      type amm-semtype:typedef;
     }
     amm:parameter value {
       description
         "A required constant value.
          This value SHALL match the type given for this object.";
-      amm:type "//ietf/amm-base/typedef/any";
+      type amm-type:typedef;
+    }
+    uses ensure-object-params;
+  }
+  typedef formal-params-tbl {
+    amm:enum 1;
+    description
+      "Introspection on formal parameters of an object which
+       can be parameterized.
+       The order of rows of the table is significant and
+       corresponds with the index of each parameter.";
+    amm:tblt {
+      amm:key "name";
+      amm:column name {
+        description
+          "The name of the parameter.
+           This is unique among all rows.";
+        type amm-type:typedef;
+      }
+      amm:column type {
+        description
+          "The type for values of the parameter.";
+        type amm-semtype:typedef;
+      }
+      amm:column default {
+        description
+          "An optional default value.
+           When there is no default, the undefined value is
+           used here.";
+        type amm-type:typedef;
+      }
     }
   }
   amm:ctrl obsolete-const {
@@ -4848,7 +5521,7 @@ This includes the following:
     amm:parameter obj {
       description
         "A reference to a CONST within an ODM only.";
-      amm:type "/aritype/CONST";
+      type ari:const;
     }
   }
 
@@ -4861,10 +5534,10 @@ This includes the following:
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        amm:type "/aritype/VAR";
+        type ari:var;
       }
       amm:column type {
-        amm:type "//ietf/amm-semtype/typedef/semtype";
+        type amm-semtype:typedef;
       }
     }
   }
@@ -4872,8 +5545,9 @@ This includes the following:
     amm:enum 9;
     description
       "Ensure a specific VAR is present in an ODM.
-       If an object already exists with the same identifiers, type,
-       and init-value this control will do nothing and succeed.
+       If an object already exists with the same identifiers,
+       parameters, type, and init-value this control will do
+       nothing and succeed.
        If an object already exists in the same namespace with either
        of the object identifiers (but not both), or the type or
        is different, this control will fail.
@@ -4883,7 +5557,7 @@ This includes the following:
     amm:parameter type {
       description
         "The type for the VAR object.";
-      amm:type "//ietf/amm-semtype/typedef/semtype";
+      type amm-semtype:typedef;
     }
     amm:parameter init-value {
       description
@@ -4891,8 +5565,9 @@ This includes the following:
          the new object and to store as the initial state
          of the object if created.
          This value SHALL match the type given for this object.";
-      amm:type "//ietf/amm-base/typedef/any";
+      type amm-type:typedef;
     }
+    uses ensure-object-params;
   }
   amm:ctrl obsolete-var {
     amm:enum 10;
@@ -4901,7 +5576,7 @@ This includes the following:
     amm:parameter obj {
       description
         "A reference to a VAR within an ODM only.";
-      amm:type "/aritype/VAR";
+      type ari:var;
     }
   }
 
@@ -4915,27 +5590,43 @@ This includes the following:
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        amm:type "/aritype/SBR";
+        type ari:sbr;
       }
       amm:column action {
         description
-          "The execution when this rule triggers.";
-        amm:type "//ietf/amm-base/typedef/MAC";
+          "The action (inline MAC or CTRL reference) to execute when
+           this rule triggers.";
+        type amm-type:typedef;
       }
       amm:column condition {
-        amm:type "//ietf/amm-base/typedef/EXPR";
+        description
+          "The condition (inline or reference) to periodically
+           evaluate and convert to BOOL type.";
+        type amm-type:typedef;
       }
       amm:column min-interval {
-        amm:type "/aritype/TD";
+        description
+          "The minimum interval of Agent time between executions of
+           the action.
+           This can also be used by an Agent to limit how frequently
+           the condition is evaluated.";
+        type ari:td;
       }
       amm:column max-count {
-        amm:type "/aritype/UVAST";
+        description
+          "Number of executions of the action, after being enabled,
+           when the rule is disabled.";
+        type ari:uvast;
       }
       amm:column init-enabled {
-        amm:type "/ARITYPE/BOOL";
+        description
+          "Whether the rule is enabled at Agent initialization.";
+        type ari:BOOL;
       }
       amm:column enabled {
-        amm:type "/ARITYPE/BOOL";
+        description
+          "The current enabled state of the rule.";
+        type ari:BOOL;
       }
     }
   }
@@ -4948,27 +5639,40 @@ This includes the following:
     amm:tblt {
       amm:key "obj";
       amm:column obj {
-        amm:type "/aritype/TBR";
+        type ari:tbr;
       }
       amm:column action {
         description
-          "The execution when this rule triggers.";
-        amm:type "//ietf/amm-base/typedef/MAC";
+          "The action (inline MAC or CTRL reference) to execute when
+           this rule triggers.";
+        type amm-type:typedef;
       }
       amm:column start-time {
-        amm:type "//ietf/amm-base/typedef/TIME";
+        description
+          "The earliest time (absolute or init-relative) at which
+           the action is executed.";
+        type amm-type:typedef;
       }
       amm:column period {
-        amm:type "/aritype/TD";
+        description
+          "How often the action is executed.";
+        type ari:td;
       }
       amm:column max-count {
-        amm:type "/aritype/UVAST";
+        description
+          "Number of executions of the action, after being enabled,
+           when the rule is disabled.";
+        type ari:uvast;
       }
       amm:column init-enabled {
-        amm:type "/ARITYPE/BOOL";
+        description
+          "Whether the rule is enabled at Agent initialization.";
+        type ari:BOOL;
       }
       amm:column enabled {
-        amm:type "/ARITYPE/BOOL";
+        description
+          "The current enabled state of the rule.";
+        type ari:BOOL;
       }
     }
   }
@@ -4983,23 +5687,34 @@ This includes the following:
     uses ensure-object-id;
     amm:parameter action {
       description
-        "The execution when this rule triggers.";
-      amm:type "//ietf/amm-base/typedef/MAC";
+        "The action (inline MAC or CTRL reference) to execute when
+         this rule triggers.";
+      type amm-type:typedef;
     }
     amm:parameter condition {
-      amm:type "//ietf/amm-base/typedef/EXPR";
+      description
+        "The condition (inline or reference) to periodically
+         evaluate and convert to BOOL type.";
+      type amm-type:typedef;
     }
     amm:parameter min-interval {
-      amm:type "/ARITYPE/TD";
+      description
+        "The minimum interval of Agent time between executions of
+         the action.
+         This can also be used by an Agent to limit how frequently
+         the condition is evaluated.";
+      type ari:TD;
     }
     amm:parameter max-count {
-      amm:type "/ARITYPE/UVAST";
+      description
+        "Number of executions of the action, after being enabled,
+         when the rule is disabled.";
+      type ari:UVAST;
     }
     amm:parameter init-enabled {
-      amm:type "/ARITYPE/BOOL";
-    }
-    amm:result res {
-      amm:type "/ARITYPE/UINT";
+      description
+        "Whether the rule is enabled at Agent initialization.";
+      type ari:BOOL;
     }
   }
   amm:ctrl ensure-tbr {
@@ -5011,43 +5726,50 @@ This includes the following:
     uses ensure-object-id;
     amm:parameter action {
       description
-        "The execution when this rule triggers.";
-      amm:type "//ietf/amm-base/typedef/MAC";
+        "The action (inline MAC or CTRL reference) to execute when
+         this rule triggers.";
+      type amm-type:typedef;
     }
     amm:parameter start-time {
-      amm:type "//ietf/amm-base/typedef/TIME";
+      description
+        "The earliest time (absolute or init-relative) at which
+         the action is executed.";
+      type amm-type:typedef;
     }
     amm:parameter period {
-      amm:type "/ARITYPE/TD";
+      description
+        "How often the action is executed.";
+      type ari:TD;
     }
     amm:parameter max-count {
-      amm:type "/ARITYPE/UVAST";
+      description
+        "Number of executions of the action, after being enabled,
+         when the rule is disabled.";
+      type ari:UVAST;
     }
     amm:parameter init-enabled {
-      amm:type "/ARITYPE/BOOL";
-    }
-    amm:result res {
-      amm:type "/ARITYPE/UINT";
+      description
+        "Whether the rule is enabled at Agent initialization.";
+      type ari:BOOL;
     }
   }
   amm:ctrl ensure-rule-enabled {
     if-feature "rules";
     amm:enum 15;
     description
-      "Ensure rule is enabled or disabled.";
+      "Ensure a specific rule is enabled or disabled.";
     amm:parameter obj-id {
       description
-        "The rule to ensure enabled setting for.";
-      amm:union {
-        amm:type "/ARITYPE/SBR";
-        amm:type "/ARITYPE/TBR";
+        "The rule of which to ensure the enabled state.";
+      type union {
+        type ari:SBR;
+        type ari:TBR;
       }
     }
     amm:parameter enabled {
-      amm:type "/ARITYPE/BOOL";
-    }
-    amm:result res {
-      amm:type "/ARITYPE/uint";
+      description
+        "The desired enabled state of the rule.";
+      type ari:BOOL;
     }
   }
   amm:ctrl reset-rule-enabled {
@@ -5057,14 +5779,11 @@ This includes the following:
       "Reset rule enabled to initial setting.";
     amm:parameter obj-id {
       description
-        "The rule to reset enabled seetting for.";
-      amm:union {
-        amm:type "/ARITYPE/SBR";
-        amm:type "/ARITYPE/TBR";
+        "The rule of which to reset the enabled state.";
+      type union {
+        type ari:SBR;
+        type ari:TBR;
       }
-    }
-    amm:result res {
-      amm:type "/ARITYPE/UINT";
     }
   }
   amm:ctrl obsolete-rule {
@@ -5076,13 +5795,15 @@ This includes the following:
     amm:parameter obj-id {
       description
         "A reference to a rule within an ODM only.";
-      amm:union {
-        amm:type "/ARITYPE/SBR";
-        amm:type "/ARITYPE/TBR";
+      type union {
+        type ari:SBR;
+        type ari:TBR;
       }
     }
     amm:result success {
-      amm:type "/ARITYPE/BOOL";
+      description
+        "Boolean indicating whether the rule was marked obsolete";
+      type ari:BOOL;
     }
   }
 
@@ -5090,38 +5811,67 @@ This includes the following:
   amm:oper negate {
     amm:enum 0;
     description
-      "Negate a value.
+      "Negate a value, numeric or TD.
        This is equivalent to multiplying by -1 but a shorter
        expression.";
-    uses numeric-unary-operands;
+    amm:operand val {
+      description
+        "The single value.";
+      type amm-type:typedef;
+    }
     uses numeric-unary-result;
   }
   amm:oper add {
     amm:enum 1;
     description
-      "Add two numeric values.
+      "Add two numeric values or a TP and TD value (in either order).
        The operands are cast to the least compatible numeric type
        before the arithmetic.";
-    uses any-binary-operands;
+    uses numeric-time-binary-operands;
     uses any-unary-result;
   }
   amm:oper sub {
     amm:enum 2;
-    uses any-binary-operands;
+    description
+      "Subtract two numeric values or a TP less a TD value.
+       The left (second) operand is the minuend and the right (first)
+       operand is the subtrahend; this means that the EXPR
+       &lt;/AC/(10, 2, ./OPER/sub)&gt; behaves as the infix '10 - 2'.
+       The operands are cast to the least compatible numeric type
+       before the arithmetic.";
+    uses numeric-time-binary-operands;
     uses any-unary-result;
   }
   amm:oper multiply {
     amm:enum 3;
-    uses any-binary-operands;
+    description
+      "Multiply two numeric values or a TD value (in either order).
+       The operands are cast to the least compatible numeric type
+       before the arithmetic.";
+    uses numeric-time-binary-operands;
     uses any-unary-result;
   }
   amm:oper divide {
     amm:enum 4;
-    uses any-binary-operands;
+    description
+      "Divide two numeric values or a TD value (as numerator).
+       The left (second) operand is the numerator and the right
+       (first) operand is the divisor; this means that the EXPR
+       &lt;/AC/(10, 2, ./OPER/divide)&gt; behaves as the infix '10 / 2'.
+       The operands are cast to the least compatible numeric type
+       before the arithmetic.";
+    uses numeric-time-binary-operands;
     uses any-unary-result;
   }
   amm:oper remainder {
     amm:enum 5;
+    description
+      "Find the remainder of a numeric operation.
+       The left (second) operand is the numerator and the right
+       (first) operand is the divisor; this means that the EXPR
+       &lt;/AC/(10, 2, ./OPER/divide)&gt; behaves as the infix '10 % 2'.
+       The operands are cast to the least compatible numeric type
+       before the arithmetic.";
     uses numeric-binary-operands;
     uses numeric-unary-result;
   }
@@ -5129,21 +5879,30 @@ This includes the following:
   // Bitwise operators
   amm:oper bit-not {
     amm:enum 6;
+    description
+      "Perform a bitwise NOT on an integer value.";
     uses integer-unary-operands;
     uses integer-unary-result;
   }
   amm:oper bit-and {
     amm:enum 7;
+    description
+      "Perform a bitwise AND between two integer values.";
     uses integer-binary-operands;
     uses integer-unary-result;
   }
   amm:oper bit-or {
     amm:enum 8;
+    description
+      "Perform a bitwise OR between two integer values.";
     uses integer-binary-operands;
     uses integer-unary-result;
   }
   amm:oper bit-xor {
     amm:enum 9;
+    description
+      "Perform a bitwise exclusive or (XOR) between two integer
+       values.";
     uses integer-binary-operands;
     uses integer-unary-result;
   }
@@ -5151,38 +5910,74 @@ This includes the following:
   // Boolean operators
   amm:oper bool-not {
     amm:enum 10;
+    description
+      "Perform a boolean NOT on a boolean value.";
     uses bool-unary-operands;
     uses bool-unary-result;
   }
   amm:oper bool-and {
     amm:enum 11;
+    description
+      "Perform a boolean AND between two boolean values.";
     uses bool-binary-operands;
     uses bool-unary-result;
   }
   amm:oper bool-or {
     amm:enum 12;
+    description
+      "Perform a boolean OR between two boolean values.";
     uses bool-binary-operands;
     uses bool-unary-result;
   }
   amm:oper bool-xor {
     amm:enum 13;
+    description
+      "Perform a boolean XOR between two boolean values.";
     uses bool-binary-operands;
     uses bool-unary-result;
   }
 
-  // Value comparison
+  // Strict value comparison
+  amm:oper strict-eq {
+    amm:enum 33;
+    description
+      "Compare two values for strict equality as defined by
+       Section 6.12.1 of the AMM.";
+    uses any-binary-operands;
+    uses bool-unary-result;
+  }
+  amm:oper strict-ne {
+    amm:enum 34;
+    description
+      "Compare two values for strict inequality as defined by
+       Section 6.12.1 of the AMM.";
+    uses any-binary-operands;
+    uses bool-unary-result;
+  }
+
+  // Loose value comparison
   amm:oper compare-eq {
     amm:enum 14;
+    description
+      "Compare two values for loose equality as defined by
+       Section 6.12.1 of the AMM.
+       Numeric operands MAY be converted to a least compatible
+       numeric type for the comparison.";
     uses any-binary-operands;
     uses bool-unary-result;
   }
   amm:oper compare-ne {
     amm:enum 15;
+    description
+      "Compare two values for loose equality as defined by
+       Section 6.12.1 of the AMM.
+       Numeric operands MAY be converted to a least compatible
+       numeric type for the comparison.";
     uses any-binary-operands;
     uses bool-unary-result;
   }
 
-  // Numeric comparison
+  // Numeric (or time-as-numeric) comparison
   amm:oper compare-gt {
     amm:enum 16;
     description
@@ -5191,7 +5986,7 @@ This includes the following:
        right value.
        The operands are cast to the least compatible numeric type
        before the comparison.";
-    uses numeric-binary-operands;
+    uses any-binary-operands;
     uses bool-unary-result;
   }
   amm:oper compare-ge {
@@ -5202,7 +5997,7 @@ This includes the following:
        to the right.
        The operands are cast to the least compatible numeric type
        before the comparison.";
-    uses numeric-binary-operands;
+    uses any-binary-operands;
     uses bool-unary-result;
   }
   amm:oper compare-lt {
@@ -5212,7 +6007,7 @@ This includes the following:
        The result is true if the left value is less than the right.
        The operands are cast to the least compatible numeric type
        before the comparison.";
-    uses numeric-binary-operands;
+    uses any-binary-operands;
     uses bool-unary-result;
   }
   amm:oper compare-le {
@@ -5223,49 +6018,629 @@ This includes the following:
        equal to the right.
        The operands are cast to the least compatible numeric type
        before the comparison.";
-    uses numeric-binary-operands;
+    uses any-binary-operands;
     uses bool-unary-result;
   }
 
-  // Table filtering
+  // Unary predicate (match) operators
+  amm:oper is-undefined {
+    amm:enum 29;
+    description
+      "Predicate to check for the undefined value.";
+    amm:operand value {
+      description
+        "The value to check.";
+      type amm-type:typedef;
+    }
+    amm:result match {
+      description
+        "True if and only if the value is the undefined value.";
+      type ari:bool;
+    }
+  }
+  amm:oper is-not-undefined {
+    amm:enum 30;
+    description
+      "Predicate to check for the undefined value.";
+    amm:operand value {
+      description
+        "The value to check.";
+      type amm-type:typedef;
+    }
+    amm:result match {
+      description
+        "False if and only if the value is the undefined value.";
+      type ari:bool;
+    }
+  }
+  amm:oper is-truthy {
+    amm:enum 35;
+    description
+      "Predicate to convert to bool type.
+       This operator will specifically consider the undefined value
+       as not-truthy with a match result of false.
+       This logic is the same as what is used internal to the Agent
+       for conditional expressions and filters.";
+    amm:operand value {
+      description
+        "The value to check.";
+      type amm-type:typedef;
+    }
+    amm:result match {
+      description
+        "True if and only if the value is truthy.";
+      type ari:bool;
+    }
+  }
+  amm:oper match-type {
+    amm:enum 45;
+    description
+      "Predicate to match against any built-in type or named typedef
+       based on the procedures of Section 6.10 of the AMM.
+       If the desired type is not known to the agent the result SHALL
+       be undefined.";
+    reference
+      "draft-ietf-dtn-amm";
+    amm:parameter desired {
+      description
+        "The desired type to match against.";
+      type union {
+        type ari:aritype;
+        type ari:typedef;
+      }
+    }
+    amm:operand value {
+      description
+        "The value to check.";
+      type amm-type:typedef;
+    }
+    amm:result match {
+      description
+        "True if and only if the value matches the desired type.";
+      type ari:bool;
+    }
+  }
+  amm:oper convert-type {
+    amm:enum 46;
+    description
+      "Type conversion operator to any built-in type or named typedef
+       based on the procedures of Section 6.11 of the AMM.
+       If the desired type is not known to the agent the result SHALL
+       be undefined.
+       If the conversion fails the result SHALL be undefined.";
+    reference
+      "draft-ietf-dtn-amm";
+    amm:parameter desired {
+      description
+        "The desired type to convert to.";
+      type union {
+        type ari:aritype;
+        type ari:typedef;
+      }
+    }
+    amm:operand value {
+      description
+        "The value to convert.";
+      type amm-type:typedef;
+    }
+    amm:result converted {
+      description
+        "The result of conversion, which can be undefined.";
+      type amm-type:typedef;
+    }
+  }
+  amm:oper match-regexp {
+    amm:enum 23;
+    description
+      "This is a unary predicate operator which will compare
+       a text value to a regular expression pattern.
+       The regular expression is limited to I-Regexp compatibility.";
+    reference
+      "RFC 9485: I-Regexp: An Interoperable Regular Expression
+       Format";
+    amm:parameter regexp {
+      description
+        "The I-Regexp text pattern to match.
+         In accordance with that definition, this pattern is
+         implicitly anchored to the start and end of the text being
+         matched (i.e. it is always a full match).";
+      type ari:textstr;
+    }
+    amm:operand value {
+      description
+        "The value to check for a match.";
+      type ari:textstr;
+    }
+    amm:result is-match {
+      description
+        "The result is true if the value matches the given pattern.";
+      type ari:bool;
+    }
+  }
+  amm:oper is-org-private {
+    amm:enum 36;
+    description
+      "Predicate to determine if an object or
+       namespace reference value has a namespace which
+       is private (i.e. has an org-id which is a negative
+       integer or text with a leading bang).";
+    amm:operand value {
+      description
+        "The reference value to check.
+         This value SHOULD NOT be de-referenced.";
+      type union {
+        type ari:object;
+        type ari:namespace;
+      }
+    }
+    amm:result match {
+      description
+        "True if and only if the org-id is private.";
+      type ari:bool;
+    }
+  }
+  amm:oper match-org-int-range {
+    amm:enum 37;
+    description
+      "Predicate to determine if a de-referenced object or
+       namespace reference value has a namespace which
+       has an org-id which is within a specific integer range.";
+    amm:parameter min-value {
+      description
+        "The minimum org-id value to match.";
+      type amm-type:typedef;
+    }
+    amm:parameter max-value {
+      description
+        "The maximum org-id value to match.";
+      type amm-type:typedef;
+    }
+    amm:operand value {
+      description
+        "The reference value to check.
+         If the reference does not use integer form of org-id,
+         it SHALL be dereferenced and translated to integer form.";
+      type union {
+        type ari:object;
+        type ari:namespace;
+      }
+    }
+    amm:result match {
+      description
+        "True if and only if the org-id is within the
+         desired inclusive range.";
+      type ari:bool;
+    }
+  }
+  amm:oper is-model-odm {
+    amm:enum 38;
+    description
+      "Predicate to determine if an object or
+       namespace reference value has a namespace which
+       is is an ODM (i.e. has an model-id which is a negative
+       integer or text with a leading bang).";
+    amm:operand value {
+      description
+        "The reference value to check.
+         This value SHOULD NOT be de-referenced.";
+      type union {
+        type ari:object;
+        type ari:namespace;
+      }
+    }
+    amm:result match {
+      description
+        "True if and only if the model is an ODM.";
+      type ari:bool;
+    }
+  }
+  amm:oper match-model-int-range {
+    amm:enum 39;
+    description
+      "Predicate to determine if a de-referenced object or
+       namespace reference value has a namespace which
+       has a model-id which is within a specific integer range.";
+    amm:parameter min-value {
+      description
+        "The minimum model-id value to match.";
+      type amm-type:typedef;
+    }
+    amm:parameter max-value {
+      description
+        "The maximum model-id value to match.";
+      type amm-type:typedef;
+    }
+    amm:operand value {
+      description
+        "The reference value to check.
+         If the reference does not use integer form of model-id,
+         it SHALL be dereferenced and translated to integer form.";
+      type union {
+        type ari:object;
+        type ari:namespace;
+      }
+    }
+    amm:result match {
+      description
+        "True if and only if the model-id is within the
+         desired inclusive range.";
+      type ari:bool;
+    }
+  }
+  amm:oper is-same-ns {
+    amm:enum 40;
+    description
+      "Predicate to determine if a de-referenced object or
+       namespace reference value matches a desired namespace
+       from a parameter.
+       The comparison is on the actual namespace, regardless
+       of whether integer or text IDs are used in either.";
+    amm:parameter desired {
+      description
+        "A reference to the desired namespace to compare with.
+         If this de-reference fails the result SHALL be undefined.";
+      type ari:namespace;
+    }
+    amm:operand value {
+      description
+        "The reference value to compare with the desired
+         namespace.
+         If the value is an object reference, it SHOULD only have
+         its namespace portion (org-id and model-id) dereferenced
+         and compared with the desired namespace.";
+      type union {
+        type ari:object;
+        type ari:namespace;
+      }
+    }
+    amm:result match {
+      description
+        "True if and only if the value references the same
+         namespace as the desired.";
+      type ari:bool;
+    }
+  }
+  amm:oper match-object-type {
+    amm:enum 42;
+    description
+      "Predicate to determine if a de-referenced object reference
+       value has a specific object type.";
+    amm:parameter desired {
+      description
+        "The desired object type, either by built-in type reference,
+         primitive integer enumeration, or text name.
+         If the desired type is unknown to the Agent the result
+         SHALL be undefined.";
+      type ari:aritype;
+    }
+    amm:operand value {
+      description
+        "The object reference value to check.
+         If the de-reference itself fails the result SHALL be
+         false.";
+      type ari:object;
+    }
+    amm:result match {
+      description
+        "True if and only if the type-id matches the desired
+         object type.";
+      type ari:bool;
+    }
+  }
+  amm:oper match-object-int-range {
+    amm:enum 44;
+    description
+      "Predicate to determine if a de-referenced object reference
+       value has an obj-id which is within a specific integer
+       range.";
+    amm:parameter min-value {
+      description
+        "The minimum obj-id value to match.";
+      type amm-type:typedef;
+    }
+    amm:parameter max-value {
+      description
+        "The maximum obj-id value to match.";
+      type amm-type:typedef;
+    }
+    amm:operand value {
+      description
+        "The reference value to check.
+         If the reference does not use integer form of obj-id,
+         it SHALL be dereferenced and translated to integer form.";
+      type ari:object;
+    }
+    amm:result match {
+      description
+        "True if and only if the obj-id is within the
+         desired inclusive range.";
+      type ari:bool;
+    }
+  }
+  amm:oper is-same-object {
+    amm:enum 41;
+    description
+      "Predicate to determine if a de-referenced object
+       reference value matches a desired object
+       from a parameter.
+       The comparison is on the actual object instance, regardless
+       of whether integer or text IDs are used in either.";
+    amm:parameter desired {
+      description
+        "A reference to the desired object to compare with.
+         If this de-reference fails the result SHALL be undefined.";
+      type ari:object;
+    }
+    amm:operand value {
+      description
+        "The reference value to compare with the desired object.
+         If this de-reference fails the result SHALL be false.";
+      type ari:object;
+    }
+    amm:result match {
+      description
+        "True if and only if the value references the same object
+         as the desired.";
+      type ari:bool;
+    }
+  }
+  amm:oper ref {
+    amm:enum 43;
+    description
+      "A zero-ary operator to copy a reference value parameter
+       into its result.
+       This is a work-around for &lt;//ietf/amm-base/typedef/expr-item&gt;
+       permitting only literal or OPER references.";
+    amm:parameter ref {
+      description
+        "The input reference value.";
+      type union {
+        type ari:object;
+        type ari:namespace;
+      }
+    }
+    amm:result ref {
+      description
+        "The output reference value.";
+      type union {
+        type ari:object;
+        type ari:namespace;
+      }
+    }
+  }
+
+  // Unary predicate function composition
+  amm:oper predicate-all {
+    amm:enum 24;
+    description
+      "Compose unary predicate operators with a result that is true
+       only when all of the subordinate operators evaluate to a
+       truthy result.
+       If any operator evaluates to the undefined value it is
+       considered not truthy and this result will be false.";
+    uses predicate-compose-interface;
+  }
+  amm:oper predicate-any {
+    amm:enum 25;
+    description
+      "Compose unary predicate operators with a result that is true
+       when any of the subordinate operators evaluate to a
+       truthy result.
+       If any operator evaluates to the undefined value it is
+       considered not truthy, so other operators are still
+       part of the result which may be true.";
+    uses predicate-compose-interface;
+  }
+  amm:oper predicate-none {
+    amm:enum 26;
+    description
+      "Compose unary predicate operators with a result that is true
+       when all of the subordinate operators do not evaluate to a
+       truthy result.
+       If any operator evaluates to the undefined value it is
+       considered not truthy, so other operators are still
+       part of the result which may be true.";
+    uses predicate-compose-interface;
+  }
+
+  // sub-expression evaluation operators
+  amm:oper eval {
+    amm:enum 28;
+    description
+      "A zero-ary operator which functions by evaluating a target
+       sub-expression using the following phases:
+         1. If the target is a reference, it is used to produce
+            a value which SHALL be an expression.
+            Otherwise, the target SHALL itself be an expression.
+         2. Evaluate the expression and consider the evaluation
+            result as this operator result.";
+    amm:parameter target {
+      description
+        "Either an inline sub-expression or a reference to an
+         object which produces an expression.";
+      type amm-type:typedef;
+    }
+    amm:result sub-result {
+      description
+        "The result of the sub-expression evaluation.";
+      type amm-type:typedef;
+    }
+  }
+  amm:oper unary-eval {
+    amm:enum 27;
+    description
+      "A unary operator which functions by evaluating a target
+       sub-expression using the following phases:
+         1. Substitute the bind-value actual parameter for
+            &lt;/label/0&gt; items within the target value
+            (literal expression or object reference).
+         2. If the target is a reference, it is used to produce
+            a value which SHALL be an expression.
+            Otherwise, the target SHALL itself be an expression.
+         3. Evaluate the expression and consider the evaluation
+            result as this operator result.
+       This is similar to the &lt;./oper/eval&gt; object with the
+       addition of the unary operand binding.";
+    amm:parameter target {
+      description
+        "Either an inline sub-expression or a reference to an
+         object which produces an expression.";
+      type amm-type:typedef;
+    }
+    amm:operand bind-value {
+      description
+        "The value to pass-through as &lt;/label/0&gt; during
+         the substitution phase of evaluation with each of the
+         subordinate operators.
+         The label does not need to be present in this
+         target, the operand can simply be ignored.
+         Any label values of 1 or larger present
+         will cause the evaluation to fail and result in
+         the undefined value.";
+      type amm-type:typedef;
+    }
+    amm:result sub-result {
+      description
+        "The result of the sub-expression evaluation.";
+      type amm-type:typedef;
+    }
+  }
+  amm:oper nary-eval {
+    amm:enum 31;
+    description
+      "An N-ary operator which functions by evaluating a target
+       sub-expression using the following phases:
+         1. Substitute the bind-values actual parameter for
+            LABEL items with integer primitive (e.g. &lt;/label/0&gt;)
+            within the target value
+            (literal expression or object reference).
+            The number of bind-able operands is given by the
+            _operand-count_ parameter.
+         2. If the target is a reference, it is used to produce
+            a value which SHALL be an expression.
+            Otherwise, the target SHALL itself be an expression.
+         3. Evaluate the expression and consider the evaluation
+            result as this operator result.
+       This is similar to the &lt;./oper/eval&gt; object with the
+       addition of the unary operand binding.";
+    amm:parameter operand-count {
+      description
+        "The number of operands to pop from the evaluation stack
+         and use as bind-values for the target parameter.
+         This is limited to signed int length because LABEL
+         values are also limited to signed int.";
+      type ari:int {
+        range "0..max";
+      }
+    }
+    amm:parameter target {
+      description
+        "Either an inline sub-expression or a reference to an
+         object which produces an expression.
+         Not all valid labels, 0 through (_operand-count_ - 1),
+         need to be present in this target, some operands can
+         simply be popped and ignored.
+         Any label values of _operand-count_ or larger present
+         will cause the evaluation to fail and result in
+         the undefined value.";
+      type amm-type:typedef;
+    }
+    amm:operand bind-values {
+      description
+        "The evaluation stack values to substitute for LABEL values
+         during the substitution phase of evaluation.
+         A total of _operand-count_ values will be popped for this
+         sequence.
+         Label 0 refers to the bottom-most popped value from
+         the stack and label (_operand-count_ - 1) refers to the
+         top of the stack.";
+      amm:seq {
+        type amm-type:typedef;
+      }
+    }
+    amm:result sub-result {
+      description
+        "The result of the sub-expression evaluation.";
+      type amm-type:typedef;
+    }
+  }
+
+  // Table (TBL) filtering
+  typedef tbl-row-filter {
+    amm:enum 0;
+    description
+      "A table filter applied using two phases for each row:
+         1. Substitute row values for LABEL items within EXPR.
+            This does not apply recursively to VALUE-OBJ within
+            the expression.
+         2. Evaluate the expression and consider the row matched
+            if the result is a truthy value.
+       Each LABEL item refers to the value at a column index
+       within the context of the input row. Label substitution
+       is performed as described in the value production section
+       of the DTNMA AMM document.";
+    reference
+      "draft-ietf-dtn-amm";
+    type amm-type:typedef;
+  }
   amm:oper tbl-filter {
     amm:enum 20;
     description
-      "Filter a table first by rows and then by columns.";
-    amm:parameter row-match {
+      "Filter a table first by rows (using an expression) and then
+       by columns (using identifiers).";
+    amm:parameter rows {
       description
-        "A filter applied using two phases for each row:
-           1. Substitute row values for LABEL items within EXPR
-           2. Evaluate the expression and consider the row matched
-              if the result is a truthy value
-         Each LABEL item refers to the value at a column index
-         within the context of the input row. Label substitution
-         is performed as described in the value production section
-         of the DTNMA AMM document.";
-      amm:type "//ietf/amm-base/typedef/EXPR";
+        "A filter for each row.";
+      type tbl-row-filter;
     }
     amm:parameter columns {
       description
         "A filter to restrict output to only the listed columns.
-         The order of columns in the filtered table shall
+         The order of columns in the filtered result table SHALL
          correspond with the order of columns in this list.";
       amm:ulist {
-        amm:type "/aritype/UVAST";
+        type ari:uvast;
       }
     }
     amm:operand in {
       description
         "Table to filter.";
-      amm:type "/aritype/TBL";
+      type ari:tbl;
     }
     amm:result out {
       description
         "The filtered table.";
-      amm:type "/aritype/TBL";
+      type ari:tbl;
+    }
+  }
+  amm:oper tbl-get {
+    amm:enum 32;
+    description
+      "Retrieve an item from the given table.";
+    amm:parameter row {
+      description
+        "Index of the row (major axis) of the item.";
+      type ari:uint;
+    }
+    amm:parameter column {
+      description
+        "Index of the column (minor axis) of the item.";
+      type ari:uint;
+    }
+    amm:operand in {
+      description
+        "List to retrieve a value from.";
+      type ari:tbl;
+    }
+    amm:result out {
+      description
+        "The retrieved value or undefined if the index is not
+         valid.";
+      type amm-type:typedef;
     }
   }
 
-  // List filtering
+  // List (AC) filtering
   amm:oper list-get {
     amm:enum 21;
     description
@@ -5273,21 +6648,22 @@ This includes the following:
     amm:parameter index {
       description
         "Index of the value to retrieve from the list.";
-      amm:type "//ietf/amm-base/typedef/INTEGER";
+      type ari:uint;
     }
     amm:operand in {
       description
         "List to retrieve a value from.";
-      amm:type "/aritype/AC";
+      type ari:ac;
     }
     amm:result out {
       description
-        "The retrieved value or undefined if the index is not valid.";
-      amm:type "//ietf/amm-base/typedef/any";
+        "The retrieved value or undefined if the index is not
+         valid.";
+      type amm-type:typedef;
     }
   }
 
-  // Map filtering
+  // Map (AM) filtering
   amm:oper map-get {
     amm:enum 22;
     description
@@ -5295,17 +6671,17 @@ This includes the following:
     amm:parameter key {
       description
         "Key of the value to retrieve from the map.";
-      amm:type "//ietf/amm-base/typedef/primitive";
+      type amm-type:typedef;
     }
     amm:operand in {
       description
         "Map to retrieve a value from.";
-      amm:type "/aritype/AM";
+      type ari:am;
     }
     amm:result out {
       description
         "The retrieved value or undefined if the key is not valid.";
-      amm:type "//ietf/amm-base/typedef/any";
+      type amm-type:typedef;
     }
   }
 }
@@ -5367,7 +6743,7 @@ The ADM module in this section implements the entities described in <xref sectio
   reference
     "draft-ietf-dtn-adm-yang";
 
-  revision 2025-07-03 {
+  revision 2026-05-01 {
     description
       "Updated for latest ADM document.";
     reference
@@ -5376,24 +6752,24 @@ The ADM module in this section implements the entities described in <xref sectio
   amm:enum 2;
 
   // Common types in this model
-  amm:typedef entry-id {
+  typedef entry-id {
     amm:enum 2;
     description
       "The identifier for an entry in any access control table.";
-    amm:type "/ARITYPE/UINT";
+    type ari:uint;
   }
-  amm:typedef optional-entry-id {
+  typedef optional-entry-id {
     amm:enum 3;
     description
       "An optional entry identifier (or a null value).";
-    amm:union {
-      amm:type "./TYPEDEF/entry-id";
-      amm:type "/ARITYPE/null";
+    type union {
+      type entry-id;
+      type ari:null;
     }
   }
 
   // Atomic permission objects
-  amm:ident permission {
+  identity permission {
     amm:enum 0;
     description
       "The base IDENT for objects usable as permissions in the
@@ -5406,71 +6782,92 @@ The ADM module in this section implements the entities described in <xref sectio
        permission.";
     amm:abstract true;
   }
-  amm:typedef permission-list {
+  typedef permission-list {
     amm:enum 0;
     description
       "A list of permission object (IDENT) references.";
     amm:ulist {
-      amm:type "/aritype/ident" {
-        amm:base "./ident/permission";
+      type ari:ident {
+        base permission;
       }
     }
   }
 
   // built-in permissions
-  amm:ident execute {
+  identity execute {
     amm:enum 10;
     description
       "Permission to allow executing specific CTRL objects.
        This includes objects used directly as EXECSET targets,
        indirectly within macros, or as actions of TBR or SBR
        objects.";
-    amm:base "./ident/permission";
+    base permission;
   }
-  amm:ident produce {
+  identity produce {
     amm:enum 11;
     description
       "Permission to allow producing values from CONST, VAR, or
        EDD objects.
        This includes production for use by reporting or evaluating
        procedures of the Agent.";
-    amm:base "./ident/permission";
+    base permission;
   }
-  amm:ident modify-var {
+  identity modify-var {
     amm:enum 12;
     description
-      "Permission to allow modifying state on VAR objects.";
-    amm:base "./ident/permission";
+      "Permission to allow modifying the value of VAR objects.
+       This includes any control which would alter the value,
+       but does not affect applications on the Agent directly
+       altering the state of an object.";
+    base permission;
   }
-  amm:ident create-odm {
+  identity modify-rule-enabled {
+    amm:enum 17;
+    description
+      "Permission to allow modifying the enabled state of
+       SBR and TBR objects.
+       This includes any control which would alter the state,
+       but does not affect Agent-internal logic related to
+       init-enabled and max-count fields of a rule.";
+    base permission;
+  }
+  identity ensure-odm {
     amm:enum 13;
     description
-      "Permission to allow creating a new ODM within an Agent.";
-    amm:base "./ident/permission";
+      "Permission to allow ensuring an ODM exists within an Agent.
+       Granting this permission will allow creating a new ODM or
+       modifying an existing ODM depending on its starting state.";
+    base permission;
   }
-  amm:ident delete-odm {
+  identity obsolete-odm {
     amm:enum 14;
     description
-      "Permission to allow deleting an ODM within an Agent.";
-    amm:base "./ident/permission";
+      "Permission to allow obsoleting an ODM within an Agent.
+       Once an ODM is obsoleted it can no longer be used but
+       its identifiers are reserved to prevent inconsistent reuse.";
+    base permission;
   }
-  amm:ident create-object {
+  identity ensure-object {
     amm:enum 15;
     description
-      "Permission to allow creating a new object within an ODM.
+      "Permission to allow ensuring an object exists within an ODM.
+       Granting this permission will allow creating a new object or
+       modifying an existing object depending on its starting state.
        The permission itself does not restrict the type of object,
        but the access list can limit the item to specific object
        types and names.";
-    amm:base "./ident/permission";
+    base permission;
   }
-  amm:ident delete-object {
+  identity obsolete-object {
     amm:enum 16;
     description
-      "Permission to allow deleting an object within an ODM.
+      "Permission to allow obsoleting an object within an ODM.
+       Once an object is obsoleted it can no longer be used but
+       its identifiers are reserved to prevent inconsistent reuse.
        The permission itself does not restrict the type of object,
        but the access list can limit the item to specific object
        types and names.";
-    amm:base "./ident/permission";
+    base permission;
   }
 
   // Default access permission
@@ -5479,10 +6876,28 @@ The ADM module in this section implements the entities described in <xref sectio
     description
       "The default permission for any object if no specific access
        are present in the &lt;./EDD/access-list&gt; table.";
-    amm:type "./TYPEDEF/permission-list";
+    type permission-list;
   }
 
   // Access control table and modifier controls
+  typedef access-target-filter {
+    amm:enum 5;
+    description
+      "A target object/namespace filter applied using two phases for
+       each row:
+         1. Substitute the target object or namespace reference for
+            &lt;/label/0&gt; items within the value.
+            This does not apply recursively to VALUE-OBJ within
+            the expression.
+         2. Evaluate the expression and consider the target matched
+            if the result is a truthy value.
+       Only LABEL value 0 is valid.
+       Label substitution is performed as described in the value
+       production section of the DTNMA AMM document.";
+    reference
+      "draft-ietf-dtn-amm";
+    type amm-type:typedef;
+  }
   amm:edd access-list {
     amm:enum 2;
     description
@@ -5492,39 +6907,41 @@ The ADM module in this section implements the entities described in <xref sectio
       amm:column access-id {
         description
           "A unique identifier for this access list item.";
-        amm:type "./TYPEDEF/entry-id";
+        type entry-id;
       }
       amm:column group-ids {
         description
           "A cross-reference to the groups getting access, or the
            empty list to match all groups.";
         amm:ulist {
-          amm:type "./TYPEDEF/entry-id";
+          type entry-id;
         }
       }
       amm:column objects {
         description
-          "A pattern for objects being granted access, which may
-           match all objects.";
-        amm:type "//ietf/amm-base/typedef/ari-pattern";
+          "A set of filters for target objects or namespaces being
+           granted access.
+           The filter &lt;/ac/(true)&gt; can be used to match-all target
+           objects.";
+        type access-target-filter;
       }
       amm:column permissions {
         description
-          "Refernces to specific permissions being granted.
+          "References to specific permissions being granted.
            Individual permission references MAY be parameterized
            as necessary.
            The absence of permissions does not grant any access.";
-        amm:type "./TYPEDEF/permission-list";
+        type permission-list;
       }
       amm:column added-at {
         description
           "Agent timestamp when this group was added.";
-        amm:type "//ietf/amm-base/typedef/timestamp";
+        type amm-type:typedef;
       }
       amm:column updated-at {
         description
           "Agent timestamp when this group was added or updated.";
-        amm:type "//ietf/amm-base/typedef/timestamp";
+        type amm-type:typedef;
       }
     }
   }
@@ -5536,26 +6953,27 @@ The ADM module in this section implements the entities described in <xref sectio
     amm:parameter access-id {
       description
         "A unique identifier for this access list item.";
-      amm:type "./TYPEDEF/entry-id";
+      type entry-id;
     }
     amm:parameter group-ids {
       description
         "Identify the groups being assigned the permission,
          or the empty list for all-groups.";
       amm:ulist {
-        amm:type "./TYPEDEF/entry-id";
+        type entry-id;
       }
     }
     amm:parameter objects {
       description
-        "ARI pattern to determine which objects will be assigned
-         the permissions.";
-      amm:type "//ietf/amm-base/typedef/ari-pattern";
+        "A set of filters for target objects or namespaces being
+         granted access.
+         The filter &lt;/ac/(true)&gt; can be used to match-all targets.";
+      type access-target-filter;
     }
     amm:parameter permissions {
       description
         "Permissions to grant to the associated group and objects";
-      amm:type "./TYPEDEF/permission-list";
+      type permission-list;
     }
   }
   amm:ctrl discard-access {
@@ -5565,20 +6983,37 @@ The ADM module in this section implements the entities described in <xref sectio
     amm:parameter access-id {
       description
         "Uniquely identify the access";
-      amm:type "./TYPEDEF/entry-id";
+      type entry-id;
     }
   }
 
   //
   // Group management
   //
+  typedef group-member-filter {
+    amm:enum 4;
+    description
+      "A member filter applied using two phases for each row:
+         1. Substitute a manager identity for &lt;/label/0&gt; items
+            within the value.
+            This does not apply recursively to VALUE-OBJ within
+            the expression.
+         2. Evaluate the expression and consider the identity matched
+            if the result is a truthy value.
+       Only LABEL value 0 is valid.
+       Label substitution is performed as described in the value
+       production section of the DTNMA AMM document.";
+    reference
+      "draft-ietf-dtn-amm";
+    type amm-type:typedef;
+  }
   amm:edd current-groups {
     amm:enum 3;
     description
       "Get the group IDs for the current execution context, which may
-       incude the implicit Agent group ID zero.";
+       include the implicit Agent group ID zero.";
     amm:ulist {
-      amm:type "./TYPEDEF/entry-id";
+      type entry-id;
     }
   }
   amm:edd group-list {
@@ -5586,36 +7021,34 @@ The ADM module in this section implements the entities described in <xref sectio
     description
       "Get the defined access control groups.";
     amm:tblt {
-      amm:key "group-id";
+      key "group-id";
       amm:column group-id {
         description
           "The unique identifier for a group.
            The agent itself has implicit group ID zero which cannot
            be modified.";
-        amm:type "./TYPEDEF/entry-id";
+        type entry-id;
       }
       amm:column name {
         description
           "The human-friendly name of the group.";
-        amm:type "//ietf/amm-base/typedef/id-text";
+        type amm-type:id-text;
       }
       amm:column members {
         description
           "The list of members of the group, identified by matching
            transport endpoint.";
-        amm:ulist {
-          amm:type "//ietf/network-base/TYPEDEF/endpoint-pattern";
-        }
+        type group-member-filter;
       }
       amm:column added-at {
         description
           "Agent timestamp when this group was added.";
-        amm:type "//ietf/amm-base/typedef/timestamp";
+        type amm-type:timestamp;
       }
       amm:column updated-at {
         description
           "Agent timestamp when this group was added or updated.";
-        amm:type "//ietf/amm-base/typedef/timestamp";
+        type amm-type:timestamp;
       }
     }
   }
@@ -5627,12 +7060,12 @@ The ADM module in this section implements the entities described in <xref sectio
     amm:parameter group-id {
       description
         "Uniquely identify the group";
-      amm:type "./TYPEDEF/entry-id";
+      type entry-id;
     }
     amm:parameter name {
       description
         "Name of the group";
-      amm:type "//ietf/amm-base/typedef/id-text";
+      type amm-type:id-text;
     }
   }
   amm:ctrl ensure-group-members {
@@ -5643,12 +7076,12 @@ The ADM module in this section implements the entities described in <xref sectio
     amm:parameter group-id {
       description
         "Uniquely identify the group";
-      amm:type "./TYPEDEF/entry-id";
+      type entry-id;
     }
     amm:parameter members {
-      amm:ulist {
-        amm:type "//ietf/network-base/TYPEDEF/endpoint-pattern";
-      }
+      description
+        "The list of endpoint patterns denoting group membership";
+      type group-member-filter;
     }
   }
   amm:ctrl discard-group {
@@ -5658,7 +7091,7 @@ The ADM module in this section implements the entities described in <xref sectio
     amm:parameter group-id {
       description
         "Uniquely identify the group";
-      amm:type "./TYPEDEF/entry-id";
+      type entry-id;
     }
   }
 }
@@ -5685,11 +7118,15 @@ implementations or their features. Readers are advised to note that
 other implementations can exist.
       </t>
       <t>
-A full implementation in Python language of the ADM module encoding and decoding, and for translating between ARI text name and integer enumeration (based on ADM contents) is present in the <tt>apl-fy24</tt> development branch of <xref target="github-dtnma-ace"/>.
+A full implementation in Python language of the ADM module encoding and decoding, and for translating between ARI text name and integer enumeration (based on ADM contents) is present in the source repository <xref target="github-dtnma-ace"/>.
 This repository includes unit test vectors for verifying ADM module encoding and decoding and is used as the basis of ADM syntax checking and formatting tools in the ADM modules in this document.
       </t>
       <t>
-The ADM modules present in Appendix A through D are version controlled in their original form in the <tt>apl-fy24</tt> development branch of <xref target="github-dtnma-adms"/>.
+The ADM modules present in Appendix A through D are version controlled in their original form in the repository <xref target="github-dtnma-adms"/>.
+      </t>
+      <t>
+An implementation of the models themselves is part of the C11 language REFDA library managed under the source repository <xref target="github-dtnma-tools"/>.
+This project has built-item (executable) testing which exercises the AMM-level interface of the REFDA through sending specific EXECSET values and observing subsequent RPTSET values as well as daemon log events.
       </t>
     </section>
     <section numbered="false" toc="include">
